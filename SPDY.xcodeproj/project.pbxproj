@@ -97,7 +97,13 @@
 		5CF0A2CC1A0952D900B6D141 /* SPDYMockURLProtocolClient.m in Sources */ = {isa = PBXBuildFile; fileRef = 5CF0A2CB1A0952D900B6D141 /* SPDYMockURLProtocolClient.m */; };
 		7774C1318AB029C6BCEF84D6 /* SPDYSessionTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 7774C2026A4DE9957D75F629 /* SPDYSessionTest.m */; };
 		7774C1F1E544793907908882 /* SPDYMockFrameEncoderDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 7774C69089A6978113F0C275 /* SPDYMockFrameEncoderDelegate.m */; };
+		7774C868441241542B0A90C0 /* SPDYStopwatch.m in Sources */ = {isa = PBXBuildFile; fileRef = 7774CE34A3AA067D98DA7ECC /* SPDYStopwatch.m */; };
 		7774CA1FA1F4A59CA0906BB7 /* SPDYSocket+SPDYSocketMock.m in Sources */ = {isa = PBXBuildFile; fileRef = 7774C0ECD0C6E5D73FB38752 /* SPDYSocket+SPDYSocketMock.m */; };
+		7774CC29BBD86413798C1425 /* SPDYStopwatch.h in Headers */ = {isa = PBXBuildFile; fileRef = 7774CE030BB898D2BE3D320D /* SPDYStopwatch.h */; };
+		7774CD12A73EA9ABAE521441 /* SPDYStopwatch.m in Sources */ = {isa = PBXBuildFile; fileRef = 7774CE34A3AA067D98DA7ECC /* SPDYStopwatch.m */; };
+		7774CD9416661E40D76713F5 /* SPDYStopwatch.h in Headers */ = {isa = PBXBuildFile; fileRef = 7774CE030BB898D2BE3D320D /* SPDYStopwatch.h */; };
+		7774CDD84A5D07F8DE5B8684 /* SPDYStopwatch.m in Sources */ = {isa = PBXBuildFile; fileRef = 7774CE34A3AA067D98DA7ECC /* SPDYStopwatch.m */; };
+		7774CF887055793F373F0D5E /* SPDYStopwatch.h in Headers */ = {isa = PBXBuildFile; fileRef = 7774CE030BB898D2BE3D320D /* SPDYStopwatch.h */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -158,6 +164,8 @@
 		7774C69089A6978113F0C275 /* SPDYMockFrameEncoderDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SPDYMockFrameEncoderDelegate.m; sourceTree = "<group>"; };
 		7774C7E1AF717FC36B7F15B6 /* SPDYSocket+SPDYSocketMock.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "SPDYSocket+SPDYSocketMock.h"; sourceTree = "<group>"; };
 		7774CD0A3295C8E314D6E3FF /* SPDYMockFrameEncoderDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SPDYMockFrameEncoderDelegate.h; sourceTree = "<group>"; };
+		7774CE030BB898D2BE3D320D /* SPDYStopwatch.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SPDYStopwatch.h; sourceTree = "<group>"; };
+		7774CE34A3AA067D98DA7ECC /* SPDYStopwatch.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SPDYStopwatch.m; sourceTree = "<group>"; };
 		D2CC14B216179B43002E37CF /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		D2CC14B816179B43002E37CF /* SPDY-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "SPDY-Prefix.pch"; sourceTree = "<group>"; };
 		D2CC14C01618CF62002E37CF /* SPDYProtocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SPDYProtocol.h; sourceTree = "<group>"; };
@@ -350,6 +358,8 @@
 				06290990169E497300E35A82 /* SPDYZLibCommon.h */,
 				0655606619D5EDA600631121 /* SPDYMetadata.h */,
 				0655606719D5EDA600631121 /* SPDYMetadata.m */,
+				7774CE030BB898D2BE3D320D /* SPDYStopwatch.h */,
+				7774CE34A3AA067D98DA7ECC /* SPDYStopwatch.m */,
 			);
 			path = SPDY;
 			sourceTree = "<group>";
@@ -367,6 +377,7 @@
 				0540DAAF19CB802600673796 /* SPDYTLSTrustEvaluator.h in Headers */,
 				0540DAAC19CB7FF900673796 /* SPDYError.h in Headers */,
 				0540DAA919CB7FEB00673796 /* SPDYCommonLogger.h in Headers */,
+				7774CD9416661E40D76713F5 /* SPDYStopwatch.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -380,6 +391,7 @@
 				05C7CEBB19CB45820032D681 /* SPDYProtocol.h in Headers */,
 				05C7CEBC19CB458F0032D681 /* SPDYTLSTrustEvaluator.h in Headers */,
 				0540DAAA19CB7FEB00673796 /* SPDYCommonLogger.h in Headers */,
+				7774CC29BBD86413798C1425 /* SPDYStopwatch.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -393,6 +405,7 @@
 				06E7BF131824371F004DB65D /* SPDYTLSTrustEvaluator.h in Headers */,
 				06811C971714D426000D1677 /* SPDYError.h in Headers */,
 				062EA640175D4CD3003BC1CE /* SPDYCommonLogger.h in Headers */,
+				7774CF887055793F373F0D5E /* SPDYStopwatch.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -595,6 +608,7 @@
 				7774C1F1E544793907908882 /* SPDYMockFrameEncoderDelegate.m in Sources */,
 				7774CA1FA1F4A59CA0906BB7 /* SPDYSocket+SPDYSocketMock.m in Sources */,
 				7774C1318AB029C6BCEF84D6 /* SPDYSessionTest.m in Sources */,
+				7774CD12A73EA9ABAE521441 /* SPDYStopwatch.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -618,6 +632,7 @@
 				062EA643175D4CD3003BC1CE /* SPDYCommonLogger.m in Sources */,
 				061C8E9617C5954400D22083 /* SPDYStreamManager.m in Sources */,
 				06B290CF1861018A00540A03 /* SPDYOrigin.m in Sources */,
+				7774C868441241542B0A90C0 /* SPDYStopwatch.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -641,6 +656,7 @@
 				062EA645175D4CD3003BC1CE /* SPDYCommonLogger.m in Sources */,
 				061C8E9817C5954400D22083 /* SPDYStreamManager.m in Sources */,
 				06B290D21861018A00540A03 /* SPDYOrigin.m in Sources */,
+				7774CDD84A5D07F8DE5B8684 /* SPDYStopwatch.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
