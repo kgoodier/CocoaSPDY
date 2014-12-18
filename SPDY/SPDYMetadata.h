@@ -26,6 +26,18 @@
 @property (nonatomic) NSUInteger hostPort;
 @property (nonatomic) BOOL viaProxy;
 
+// The following measurements, presented in seconds, use mach_absolute_time() and are point-in-time
+// relative to whatever base mach_absolute_time() uses. They are best consumed relative to
+// timeSessionConnected, which is always guaranteed to be the smallest value of all these. A value
+// of 0 for any of them means it was not set.
+@property (nonatomic) SPDYTimeInterval timeSessionConnected;
+@property (nonatomic) SPDYTimeInterval timeStreamCreated;
+@property (nonatomic) SPDYTimeInterval timeStreamStarted;
+@property (nonatomic) SPDYTimeInterval timeStreamLastRequestData;
+@property (nonatomic) SPDYTimeInterval timeStreamResponse;
+@property (nonatomic) SPDYTimeInterval timeStreamFirstData;
+@property (nonatomic) SPDYTimeInterval timeStreamClosed;
+
 - (NSDictionary *)dictionary;
 
 + (void)setMetadata:(SPDYMetadata *)metadata forAssociatedDictionary:(NSMutableDictionary *)dictionary;

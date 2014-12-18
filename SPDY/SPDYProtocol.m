@@ -13,6 +13,11 @@
 #error "This file requires ARC support."
 #endif
 
+// Enable diagnostic audit log only on-demand for developer builds
+#ifdef DEBUG
+#define VERBOSE_AUDIT_LOG 0
+#endif
+
 #import <arpa/inet.h>
 #import "NSURLRequest+SPDYURLRequest.h"
 #import "SPDYCanonicalRequest.h"
@@ -347,6 +352,58 @@ static id<SPDYTLSTrustEvaluator> trustEvaluator;
 - (void)stopLoading
 {
     SPDY_INFO(@"stop loading %@", self.request.URL.absoluteString);
+
+#if VERBOSE_AUDIT_LOG
+
+#define TIME_DIFF(startTime, stopTime) (NSInteger)(((stopTime) <= 0 || (startTime) <= 0) ? -1 : (1000 * ((stopTime) - (startTime))))
+#define STREAMTIME_DIFF(stopTime) (NSInteger)((stopTime) <= 0 ? -1 : (1000 * ((stopTime) - metadata.timeStreamCreated)))
+
+    SPDYMetadata *metadata = _stream.metadata;
+    NSInteger duration = TIME_DIFF(metadata.timeStreamCreated, metadata.timeStreamClosed);
+    NSInteger serverLatency = TIME_DIFF(metadata.timeStreamLastRequestData, metadata.timeStreamResponse);
+    SPDY_INFO(@"STREAMMETA id %u connected %tu blocked %tu duration %zd serverLatency %zd latency %zd tx %tu rx %tu cellular %u host %@ url %@",
+            metadata.streamId,
+            metadata.connectedMs,
+            metadata.blockedMs,
+            duration,
+            serverLatency,
+            metadata.latencyMs,
+            metadata.txBytes,
+            metadata.rxBytes,
+            (uint32_t)(metadata.cellular ? 1 : 0),
+            metadata.hostAddress,
+            self.request.URL.absoluteString);
+
+    NSInteger createdAt = TIME_DIFF(metadata.timeSessionConnected, metadata.timeStreamStarted);
+    NSInteger started = STREAMTIME_DIFF(metadata.timeStreamStarted);
+    NSInteger lastRequestData = STREAMTIME_DIFF(metadata.timeStreamLastRequestData);
+    NSInteger response = STREAMTIME_DIFF(metadata.timeStreamResponse);
+    NSInteger firstData = STREAMTIME_DIFF(metadata.timeStreamFirstData);
+    NSInteger closed = STREAMTIME_DIFF(metadata.timeStreamClosed);
+
+    NSInteger requestDuration = (lastRequestData <= 0 || started <= 0) ? -1 : (lastRequestData - started);
+    NSInteger dataDuration = (closed <= 0 || response <= 0) ? -1 : (closed - response);
+    NSInteger txPerSecond = (requestDuration <= 0) ? -1 : (1000 * metadata.txBytes / requestDuration);
+    NSInteger rxPerSecond = (dataDuration <= 0) ? -1 : (1000 * metadata.rxBytes / dataDuration);
+
+    SPDY_INFO(@"STREAMTIME id %u createdAt %zd started %zd lastRequestData %zd response %zd firstData %zd closed %zd txps %zd rxps %zd tx %tu rx %tu url %@",
+            metadata.streamId,
+            createdAt,
+            started,
+            lastRequestData,
+            response,
+            firstData,
+            closed,
+            txPerSecond,
+            rxPerSecond,
+            metadata.txBytes,
+            metadata.rxBytes,
+            self.request.URL.absoluteString);
+
+#undef TIME_DIFF
+#undef STREAMTIME_DIFF
+
+#endif
 
     if (_stream && !_stream.closed) {
         [_stream cancel];

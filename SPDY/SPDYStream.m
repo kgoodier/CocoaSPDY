@@ -81,6 +81,8 @@
         _receivedReply = NO;
         _metadata = [[SPDYMetadata alloc] init];
         _blockedStopwatch = [[SPDYStopwatch alloc] init];
+
+        _metadata.timeStreamCreated = [SPDYStopwatch currentSystemTime];
     }
     return self;
 }
@@ -113,6 +115,8 @@
         _dataStreamRef = (__bridge CFReadStreamRef)_dataStream;
         SCHEDULE_STREAM();
     }
+
+    _metadata.timeStreamStarted = [SPDYStopwatch currentSystemTime];
 }
 
 - (bool)reset
@@ -167,6 +171,7 @@
 
     [self markUnblocked];  // just in case. safe if already unblocked.
     _metadata.blockedMs = _blockedElapsed * 1000;
+    _metadata.timeStreamClosed = [SPDYStopwatch currentSystemTime];
 
     if (_client) {
         // Failing to pass an error leads to null pointer exception
@@ -192,6 +197,7 @@
 {
     // Transitioning from open to close?
     if (!_localSideClosed && localSideClosed) {
+        _metadata.timeStreamLastRequestData = [SPDYStopwatch currentSystemTime];
         [self markUnblocked];
     }
 
@@ -215,6 +221,7 @@
 {
     [self markUnblocked];  // just in case. safe if already unblocked.
     _metadata.blockedMs = _blockedElapsed * 1000;
+    _metadata.timeStreamClosed = [SPDYStopwatch currentSystemTime];
 
     if (_client) {
         [_client URLProtocolDidFinishLoading:_protocol];
@@ -297,6 +304,7 @@
 
 - (void)didReceiveResponse:(NSDictionary *)headers
 {
+    _metadata.timeStreamResponse = [SPDYStopwatch currentSystemTime];
     _receivedReply = YES;
 
     NSInteger statusCode = [headers[@":status"] intValue];
@@ -417,6 +425,10 @@
 
 - (void)didLoadData:(NSData *)data
 {
+    if (_metadata.timeStreamFirstData == 0) {
+        _metadata.timeStreamFirstData = [SPDYStopwatch currentSystemTime];
+    }
+
     NSUInteger dataLength = data.length;
     if (dataLength == 0) return;
 

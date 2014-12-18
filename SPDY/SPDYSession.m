@@ -191,6 +191,7 @@
     if (_sessionLatency >= 0) {
         stream.metadata.latencyMs = (NSInteger)(_sessionLatency * 1000);
     }
+    stream.metadata.timeSessionConnected = _connectedStopwatch.startSystemTime;
     stream.metadata.connectedMs = _connectedStopwatch.elapsedSeconds * 1000;
     stream.metadata.hostAddress = _socket.connectedHost;
     stream.metadata.hostPort = _socket.connectedPort;
