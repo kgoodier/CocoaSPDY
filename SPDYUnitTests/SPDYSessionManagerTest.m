@@ -95,7 +95,7 @@
     SPDYProtocol *protocol = [[SPDYProtocol alloc] init];
     SPDYStream * __weak weakStream = nil;
     @autoreleasepool {
-        SPDYStream *stream = [[SPDYStream alloc] initWithProtocol:protocol];
+        SPDYStream *stream = [[SPDYStream alloc] initWithProtocol:protocol pushStreamManager:nil];
         weakStream = stream;
         urlRequest.SPDYDeferrableInterval = 0;
         stream.request = urlRequest;
@@ -149,7 +149,7 @@
     SPDYProtocol *protocol = [[SPDYProtocol alloc] init];
     SPDYStream * __weak weakStream = nil;
     @autoreleasepool {
-        SPDYStream *stream = [[SPDYStream alloc] initWithProtocol:protocol];
+        SPDYStream *stream = [[SPDYStream alloc] initWithProtocol:protocol pushStreamManager:nil];
         weakStream = stream;
         urlRequest.SPDYDeferrableInterval = 0;
         stream.request = urlRequest;
@@ -189,9 +189,9 @@
 
     SPDYProtocol *protocol = [[SPDYProtocol alloc] init];
     SPDYProtocol *protocol2 = [[SPDYProtocol alloc] init];
-    SPDYStream *stream = [[SPDYStream alloc] initWithProtocol:protocol];
+    SPDYStream *stream = [[SPDYStream alloc] initWithProtocol:protocol pushStreamManager:nil];
     stream.request = urlRequest;
-    SPDYStream *stream2 = [[SPDYStream alloc] initWithProtocol:protocol2];
+    SPDYStream *stream2 = [[SPDYStream alloc] initWithProtocol:protocol2 pushStreamManager:nil];
     stream2.request = urlRequest;
 
     // Force reachability and queue stream1
@@ -248,10 +248,10 @@
     SPDYSocket *socket = [[SPDYSocket alloc] initWithDelegate:nil];
 
     SPDYProtocol *protocol = [[SPDYProtocol alloc] init];
-    SPDYStream *stream = [[SPDYStream alloc] initWithProtocol:protocol];
+    SPDYStream *stream = [[SPDYStream alloc] initWithProtocol:protocol pushStreamManager:nil];
     stream.request = urlRequest;
     SPDYProtocol *protocol2 = [[SPDYProtocol alloc] init];
-    SPDYStream *stream2 = [[SPDYStream alloc] initWithProtocol:protocol2];
+    SPDYStream *stream2 = [[SPDYStream alloc] initWithProtocol:protocol2 pushStreamManager:nil];
     stream2.request = urlRequest;
 
     // Force reachability and queue stream1
@@ -319,7 +319,7 @@
     SPDYSocket *socket = [[SPDYSocket alloc] initWithDelegate:nil];
 
     SPDYProtocol *protocol = [[SPDYProtocol alloc] init];
-    SPDYStream *stream = [[SPDYStream alloc] initWithProtocol:protocol];
+    SPDYStream *stream = [[SPDYStream alloc] initWithProtocol:protocol pushStreamManager:nil];
     stream.request = urlRequest;
 
     // Force reachability to WIFI and queue stream
@@ -382,7 +382,7 @@
     SPDYSocket *socket = [[SPDYSocket alloc] initWithDelegate:nil];
 
     SPDYProtocol *protocol = [[SPDYProtocol alloc] init];
-    SPDYStream *stream = [[SPDYStream alloc] initWithProtocol:protocol];
+    SPDYStream *stream = [[SPDYStream alloc] initWithProtocol:protocol pushStreamManager:nil];
     stream.request = urlRequest;
 
     // Force reachability to WIFI and queue stream

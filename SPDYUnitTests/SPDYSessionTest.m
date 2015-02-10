@@ -78,7 +78,7 @@
 
 - (void)testReceivedStreamTimingsMetadataForSingleShortRequest
 {
-    SPDYStream *stream = [[SPDYStream alloc] initWithProtocol:[self createProtocol]];
+    SPDYStream *stream = [[SPDYStream alloc] initWithProtocol:[self createProtocol] pushStreamManager:nil];
     [_session openStream:stream];
     STAssertTrue([_mockDecoderDelegate.lastFrame isKindOfClass:[SPDYSynStreamFrame class]], nil);
     [_mockDecoderDelegate clear];
@@ -156,11 +156,11 @@
     [self mockSynStreamAndReplyWithId:1 last:YES];
 
     // Send two SYN_STREAMs only, no reply
-    [_session openStream:[[SPDYStream alloc] initWithProtocol:[self createProtocol]]];
+    [_session openStream:[[SPDYStream alloc] initWithProtocol:[self createProtocol] pushStreamManager:nil]];
     STAssertTrue([_mockDecoderDelegate.lastFrame isKindOfClass:[SPDYSynStreamFrame class]], nil);
     [_mockDecoderDelegate clear];
 
-    [_session openStream:[[SPDYStream alloc] initWithProtocol:[self createProtocol]]];
+    [_session openStream:[[SPDYStream alloc] initWithProtocol:[self createProtocol] pushStreamManager:nil]];
     STAssertTrue([_mockDecoderDelegate.lastFrame isKindOfClass:[SPDYSynStreamFrame class]], nil);
     [_mockDecoderDelegate clear];
 
@@ -196,7 +196,7 @@
 
             // 1.) Issue a HTTP request towards the server, this will send the SYN_STREAM request and wait
             // for the SYN_REPLY. It will use stream-id of 1 since it's the first request.
-            [_session openStream:[[SPDYStream alloc] initWithProtocol:protocolRequest]];
+            [_session openStream:[[SPDYStream alloc] initWithProtocol:protocolRequest pushStreamManager:nil]];
             STAssertTrue([_mockDecoderDelegate.framesReceived[0] isKindOfClass:[SPDYSynStreamFrame class]], nil);
             STAssertTrue([_mockDecoderDelegate.framesReceived[1] isKindOfClass:[SPDYDataFrame class]], nil);
             STAssertTrue(((SPDYDataFrame *)_mockDecoderDelegate.framesReceived[1]).last, nil);
@@ -282,7 +282,7 @@
     NSMutableData *data = [NSMutableData dataWithLength:1];
 
     // Send a SYN_STREAM, no reply
-    [_session openStream:[[SPDYStream alloc] initWithProtocol:[self createProtocol]]];
+    [_session openStream:[[SPDYStream alloc] initWithProtocol:[self createProtocol] pushStreamManager:nil]];
     STAssertTrue([_mockDecoderDelegate.lastFrame isKindOfClass:[SPDYSynStreamFrame class]], nil);
     [_mockDecoderDelegate clear];
 
@@ -359,7 +359,7 @@
     _URLRequest.SPDYDeferrableInterval = 1.0;
     [_URLRequest setValue:@"50" forHTTPHeaderField:@"content-length"];
 
-    SPDYStream *stream = [[SPDYStream alloc] initWithProtocol:[self createProtocol]];
+    SPDYStream *stream = [[SPDYStream alloc] initWithProtocol:[self createProtocol] pushStreamManager:nil];
     [stream startWithStreamId:1 sendWindowSize:1024 receiveWindowSize:1024];
 
     NSDictionary *headers = @{@":scheme":@"https", @":host":@"mocked", @":path":@"/init",
@@ -391,7 +391,7 @@
     _URLRequest.SPDYBodyFile = @"bodyfile.txt";
     [_URLRequest setValue:@"50" forHTTPHeaderField:@"content-length"];
 
-    SPDYStream *stream = [[SPDYStream alloc] initWithProtocol:[self createProtocol]];
+    SPDYStream *stream = [[SPDYStream alloc] initWithProtocol:[self createProtocol] pushStreamManager:nil];
     [stream startWithStreamId:1 sendWindowSize:1024 receiveWindowSize:1024];
 
     NSDictionary *headers = @{@":scheme":@"http", @":host":@"mocked", @":path":@"/init",
@@ -419,7 +419,7 @@
     _URLRequest = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:@"https://mocked/init"]];
     _URLRequest.HTTPMethod = @"POST";
     _URLRequest.HTTPBodyStream = inputStream;  // test stream this time
-    SPDYStream *stream = [[SPDYStream alloc] initWithProtocol:[self createProtocol]];
+    SPDYStream *stream = [[SPDYStream alloc] initWithProtocol:[self createProtocol] pushStreamManager:nil];
     [stream startWithStreamId:1 sendWindowSize:1024 receiveWindowSize:1024];
 
     NSDictionary *headers = @{@":scheme":@"https", @":host":@"mocked", @":path":@"/init",
