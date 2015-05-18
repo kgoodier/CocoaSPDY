@@ -213,5 +213,62 @@
     [SPDYProtocol unregisterAlias:@"https://bare.twitter.com"];
 }
 
+- (void)testSetAndGetConfiguration
+{
+    SPDYConfiguration *c1 = [SPDYConfiguration defaultConfiguration];
+    c1.sessionPoolSize = 4;
+    c1.sessionReceiveWindow = 2000;
+    c1.streamReceiveWindow = 1000;
+    c1.headerCompressionLevel = 5;
+    c1.enableSettingsMinorVersion = NO;
+    c1.tlsSettings = @{@"Key1":@"Value1"};
+    c1.connectTimeout = 1.0;
+    c1.enableTCPNoDelay = YES;
+
+    [SPDYProtocol setConfiguration:c1];
+    SPDYConfiguration *c2 = [SPDYProtocol currentConfiguration];
+
+    STAssertEquals(c2.sessionPoolSize, (NSUInteger)4, nil);
+    STAssertEquals(c2.sessionReceiveWindow, (NSUInteger)2000, nil);
+    STAssertEquals(c2.streamReceiveWindow, (NSUInteger)1000, nil);
+    STAssertEquals(c2.headerCompressionLevel, (NSUInteger)5, nil);
+    STAssertEquals(c2.enableSettingsMinorVersion, NO, nil);
+    STAssertEquals(c2.tlsSettings[@"Key1"], @"Value1", nil);
+    STAssertEquals(c2.connectTimeout, 1.0, nil);
+    STAssertEquals(c2.enableTCPNoDelay, YES, nil);
+
+    // Reset
+    [SPDYProtocol setConfiguration:[SPDYConfiguration defaultConfiguration]];
+}
+
+- (void)testRegisterOrigin
+{
+    NSURL *url1 = [NSURL URLWithString:@"https://mocked.com:443/bar.json"];
+    NSURL *url2 = [NSURL URLWithString:@"https://mocked.com:8443/bar.json"];
+    NSURL *url3 = [NSURL URLWithString:@"https://unmocked.com:443/bar.json"];
+    NSMutableURLRequest *request1 = [[NSMutableURLRequest alloc] initWithURL:url1];
+    NSMutableURLRequest *request2 = [[NSMutableURLRequest alloc] initWithURL:url2];
+    NSMutableURLRequest *request3 = [[NSMutableURLRequest alloc] initWithURL:url3];
+
+    STAssertFalse([SPDYURLConnectionProtocol canInitWithRequest:request1], nil);
+    STAssertFalse([SPDYURLConnectionProtocol canInitWithRequest:request2], nil);
+    STAssertFalse([SPDYURLConnectionProtocol canInitWithRequest:request3], nil);
+
+    [SPDYURLConnectionProtocol registerOrigin:@"https://mocked.com:443"];
+    [SPDYURLConnectionProtocol registerOrigin:@"https://mocked.com:8443"];
+    STAssertTrue([SPDYURLConnectionProtocol canInitWithRequest:request1], nil);
+    STAssertTrue([SPDYURLConnectionProtocol canInitWithRequest:request2], nil);
+    STAssertFalse([SPDYURLConnectionProtocol canInitWithRequest:request3], nil);
+
+    [SPDYURLConnectionProtocol unregisterOrigin:@"https://mocked.com:8443"];
+    STAssertTrue([SPDYURLConnectionProtocol canInitWithRequest:request1], nil);
+    STAssertFalse([SPDYURLConnectionProtocol canInitWithRequest:request2], nil);
+    STAssertFalse([SPDYURLConnectionProtocol canInitWithRequest:request3], nil);
+
+    [SPDYURLConnectionProtocol unregisterAllOrigins];
+    [SPDYURLConnectionProtocol unregisterAllAliases];
+    STAssertFalse([SPDYURLConnectionProtocol canInitWithRequest:request1], nil);
+}
+
 @end
 
