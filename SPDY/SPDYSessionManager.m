@@ -34,7 +34,7 @@ static void SPDYReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkR
 - (void)session:(SPDYSession *)session capacityIncreased:(NSUInteger)capacity;
 - (void)session:(SPDYSession *)session connectedToNetwork:(bool)cellular;
 - (void)sessionClosed:(SPDYSession *)session;
-- (void)streamCanceled:(SPDYStream *)stream;
+- (void)streamCanceled:(SPDYStream *)stream status:(SPDYStreamStatus)status;
 @end
 
 @implementation SPDYSessionManager
@@ -149,7 +149,7 @@ static void SPDYReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkR
 
 #pragma mark SPDYStreamDelegate
 
-- (void)streamCanceled:(SPDYStream *)stream
+- (void)streamCanceled:(SPDYStream *)stream status:(SPDYStreamStatus)status
 {
     NSAssert(_pendingStreams[stream.protocol], @"stream delegate must be managing stream");
 
