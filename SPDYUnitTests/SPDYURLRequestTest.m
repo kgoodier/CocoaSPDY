@@ -13,6 +13,7 @@
 #import "NSURLRequest+SPDYURLRequest.h"
 #import "SPDYCanonicalRequest.h"
 #import "SPDYProtocol.h"
+#import "SPDYCanonicalRequest.h"
 
 @interface SPDYURLRequestTest : SenTestCase
 @end
@@ -554,7 +555,7 @@ NSMutableURLRequest *request2 = [[NSMutableURLRequest alloc] initWithURL:url]; \
     EQUALITYTEST_SETUP();
     request1.HTTPShouldHandleCookies = YES;
     request2.HTTPShouldHandleCookies = NO;
-    
+
     STAssertFalse([request1 isEqual:request2], nil);
 }
 
