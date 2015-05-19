@@ -356,35 +356,172 @@
     STAssertEquals(immutableCopy.SPDYURLSession, weakURLSession, nil);
 }
 
+#pragma mark NSURLCache tests
+
+- (void)_addToCache:(NSURLCache *)cache request:(NSURLRequest *)request statusCode:(NSInteger)statusCode contentLength:(NSInteger)contentLength responseHeaders:(NSDictionary *)responseHeaders
+{
+    // Build response
+    NSMutableDictionary *newResponseHeaders = [responseHeaders mutableCopy];
+    newResponseHeaders[@"Content-Length"] = [@(contentLength) stringValue];
+    NSMutableData *responseData = [[NSMutableData alloc] initWithLength:contentLength];
+    NSHTTPURLResponse *response = [[NSHTTPURLResponse alloc] initWithURL:request.URL statusCode:statusCode HTTPVersion:@"HTTP/1.1" headerFields:newResponseHeaders];
+    NSCachedURLResponse *cachedResponse = [[NSCachedURLResponse alloc] initWithResponse:response data:responseData];
+
+    // Cache it
+    [cache storeCachedResponse:cachedResponse forRequest:request];
+}
+
 - (void)testRequestCacheEqualityDoesIgnoreProperties
 {
+    NSURLCache *cache = [[NSURLCache alloc] initWithMemoryCapacity:512000 diskCapacity:10000000 diskPath:@"testcache"];
     NSURL *url = [[NSURL alloc] initWithString:@"http://example.com/test/path"];
-
-    // Build request with headers & properties
     NSMutableURLRequest *request = [[NSMutableURLRequest alloc] initWithURL:url];
     [request addValue:@"Bar" forHTTPHeaderField:@"Foo"];
     request.SPDYPriority = 2;
     request.SPDYURLSession = [NSURLSession sessionWithConfiguration:[NSURLSessionConfiguration defaultSessionConfiguration]];
     request.SPDYBodyFile = @"Bodyfile.json";
 
-    // Build response
-    NSDictionary *responseHeaders = @{@"Content-Length": @"1000", @"Cache-Control": @"max-age=3600", @"TestHeader": @"TestValue"};
-    NSMutableData *responseData = [[NSMutableData alloc] initWithCapacity:1000];
-    NSHTTPURLResponse *response = [[NSHTTPURLResponse alloc] initWithURL:url statusCode:200 HTTPVersion:@"HTTP/1.1" headerFields:responseHeaders];
-    NSCachedURLResponse *cachedResponse = [[NSCachedURLResponse alloc] initWithResponse:response data:responseData];
-
-    // Cache it
-    NSURLCache *cache = [[NSURLCache alloc] initWithMemoryCapacity:512000 diskCapacity:10000000 diskPath:@"testcache"];
-    [cache storeCachedResponse:cachedResponse forRequest:request];
+    [self _addToCache:cache
+              request:request
+           statusCode:503
+        contentLength:1000
+      responseHeaders:@{@"TestHeader": @"TestValue", @"Cache-Control": @"max-age=3600"}];
 
     // New request, no properties or headers
     NSMutableURLRequest *newRequest = [[NSMutableURLRequest alloc] initWithURL:url];
     NSCachedURLResponse *newCachedResponse = [cache cachedResponseForRequest:newRequest];
 
     STAssertNotNil(newCachedResponse, nil);
+    STAssertEquals(newCachedResponse.data.length, (NSUInteger)1000, nil);
     STAssertNil(newRequest.SPDYURLSession, nil);
     STAssertEqualObjects(((NSHTTPURLResponse *)newCachedResponse.response).allHeaderFields[@"TestHeader"], @"TestValue", nil);
 }
+
+- (void)testRequestCacheEqualityDoesIgnoreCacheHeaders
+{
+    NSURLCache *cache = [[NSURLCache alloc] initWithMemoryCapacity:512000 diskCapacity:10000000 diskPath:@"testcache"];
+    NSURL *url = [[NSURL alloc] initWithString:@"http://example.com/test/path"];
+    NSMutableURLRequest *request = [[NSMutableURLRequest alloc] initWithURL:url];
+
+    [self _addToCache:cache
+              request:request
+           statusCode:503
+        contentLength:1000
+      responseHeaders:@{@"TestHeader": @"TestValue", @"Cache-Control": @"no-cache, no-store"}];
+
+    // New request, no properties or headers
+    NSMutableURLRequest *newRequest = [[NSMutableURLRequest alloc] initWithURL:url];
+    NSCachedURLResponse *newCachedResponse = [cache cachedResponseForRequest:newRequest];
+
+    STAssertNotNil(newCachedResponse, nil);
+    STAssertEquals(newCachedResponse.data.length, (NSUInteger)1000, nil);
+    STAssertEqualObjects(((NSHTTPURLResponse *)newCachedResponse.response).allHeaderFields[@"TestHeader"], @"TestValue", nil);
+}
+
+- (void)testRequestCacheEqualityDoesIgnoreStatusCode
+{
+    NSURLCache *cache = [[NSURLCache alloc] initWithMemoryCapacity:512000 diskCapacity:10000000 diskPath:@"testcache"];
+    NSURL *url = [[NSURL alloc] initWithString:@"http://example.com/test/path"];
+    NSMutableURLRequest *request = [[NSMutableURLRequest alloc] initWithURL:url];
+
+    [self _addToCache:cache
+              request:request
+           statusCode:503
+        contentLength:1000
+      responseHeaders:@{@"TestHeader": @"TestValue"}];
+
+    // New request, no properties or headers
+    NSMutableURLRequest *newRequest = [[NSMutableURLRequest alloc] initWithURL:url];
+    NSCachedURLResponse *newCachedResponse = [cache cachedResponseForRequest:newRequest];
+
+    STAssertNotNil(newCachedResponse, nil);
+    STAssertEquals(newCachedResponse.data.length, (NSUInteger)1000, nil);
+    STAssertEqualObjects(((NSHTTPURLResponse *)newCachedResponse.response).allHeaderFields[@"TestHeader"], @"TestValue", nil);
+}
+
+- (void)testRequestCacheDoesRemoveSingleItemOutOfMany
+{
+    NSURLCache *cache = [[NSURLCache alloc] initWithMemoryCapacity:512000 diskCapacity:10000000 diskPath:@"testcache"];
+    NSURL *url = [[NSURL alloc] initWithString:@"http://example.com/test/path"];
+    NSMutableURLRequest *request = [[NSMutableURLRequest alloc] initWithURL:url];
+    NSURL *url2 = [[NSURL alloc] initWithString:@"http://example.com/test/path2"];
+    NSMutableURLRequest *request2 = [[NSMutableURLRequest alloc] initWithURL:url2];
+
+    [self _addToCache:cache
+              request:request
+           statusCode:200
+        contentLength:1000
+      responseHeaders:@{@"TestHeader": @"TestValue"}];
+
+    [self _addToCache:cache
+              request:request2
+           statusCode:200
+        contentLength:2000
+      responseHeaders:@{@"TestHeader2": @"TestValue2"}];
+
+    // New request, no properties or headers
+    NSMutableURLRequest *newRequest = [[NSMutableURLRequest alloc] initWithURL:url];
+    NSMutableURLRequest *newRequest2 = [[NSMutableURLRequest alloc] initWithURL:url2];
+
+    NSCachedURLResponse *newCachedResponse = [cache cachedResponseForRequest:newRequest];
+    NSCachedURLResponse *newCachedResponse2 = [cache cachedResponseForRequest:newRequest2];
+    STAssertNotNil(newCachedResponse, nil);
+    STAssertNotNil(newCachedResponse2, nil);
+    STAssertEqualObjects(((NSHTTPURLResponse *)newCachedResponse.response).allHeaderFields[@"TestHeader"], @"TestValue", nil);
+    STAssertEqualObjects(((NSHTTPURLResponse *)newCachedResponse2.response).allHeaderFields[@"TestHeader2"], @"TestValue2", nil);
+
+    // Remove one of them
+    [cache removeCachedResponseForRequest:newRequest];
+
+    newCachedResponse = [cache cachedResponseForRequest:newRequest];
+    newCachedResponse2 = [cache cachedResponseForRequest:newRequest2];
+    STAssertNil(newCachedResponse, nil);
+    STAssertNotNil(newCachedResponse2, nil);
+
+}
+
+- (void)testRequestCacheDoesRemoveAllItems
+{
+    NSURLCache *cache = [[NSURLCache alloc] initWithMemoryCapacity:512000 diskCapacity:10000000 diskPath:@"testcache"];
+    NSURL *url = [[NSURL alloc] initWithString:@"http://example.com/test/path"];
+    NSMutableURLRequest *request = [[NSMutableURLRequest alloc] initWithURL:url];
+    NSURL *url2 = [[NSURL alloc] initWithString:@"http://example.com/test/path2"];
+    NSMutableURLRequest *request2 = [[NSMutableURLRequest alloc] initWithURL:url2];
+
+    [self _addToCache:cache
+              request:request
+           statusCode:200
+        contentLength:1000
+      responseHeaders:@{@"TestHeader": @"TestValue"}];
+
+    [self _addToCache:cache
+              request:request2
+           statusCode:200
+        contentLength:2000
+      responseHeaders:@{@"TestHeader2": @"TestValue2"}];
+
+    // New request, no properties or headers
+    NSMutableURLRequest *newRequest = [[NSMutableURLRequest alloc] initWithURL:url];
+    NSMutableURLRequest *newRequest2 = [[NSMutableURLRequest alloc] initWithURL:url2];
+
+    NSCachedURLResponse *newCachedResponse = [cache cachedResponseForRequest:newRequest];
+    NSCachedURLResponse *newCachedResponse2 = [cache cachedResponseForRequest:newRequest2];
+    STAssertNotNil(newCachedResponse, nil);
+    STAssertNotNil(newCachedResponse2, nil);
+    STAssertEqualObjects(((NSHTTPURLResponse *)newCachedResponse.response).allHeaderFields[@"TestHeader"], @"TestValue", nil);
+    STAssertEqualObjects(((NSHTTPURLResponse *)newCachedResponse2.response).allHeaderFields[@"TestHeader2"], @"TestValue2", nil);
+
+    // Remove all of them
+    [cache removeAllCachedResponses];
+
+    newCachedResponse = [cache cachedResponseForRequest:newRequest];
+    newCachedResponse2 = [cache cachedResponseForRequest:newRequest2];
+    STAssertNil(newCachedResponse, nil);
+    STAssertNil(newCachedResponse2, nil);
+
+}
+
+#pragma mark Equality tests
 
 #define EQUALITYTEST_SETUP() \
 NSURL *url = [[NSURL alloc] initWithString:@"http://example.com/test/path"]; \
