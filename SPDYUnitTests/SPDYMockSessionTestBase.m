@@ -148,12 +148,19 @@
     // for the SYN_REPLY. It will use stream-id of 1 since it's the first request.
     SPDYStream *stream = [self createStream];
     [_session openStream:stream];
-    STAssertTrue([_mockDecoderDelegate.lastFrame isKindOfClass:[SPDYSynStreamFrame class]], nil);
+    if (stream.request.HTTPBody) {
+        STAssertEquals(_mockDecoderDelegate.frameCount, (NSUInteger)2, nil);
+        STAssertTrue([_mockDecoderDelegate.framesReceived[0] isKindOfClass:[SPDYSynStreamFrame class]], nil);
+        STAssertTrue([_mockDecoderDelegate.framesReceived[1] isKindOfClass:[SPDYDataFrame class]], nil);
+    } else {
+        STAssertEquals(_mockDecoderDelegate.frameCount, (NSUInteger)1, nil);
+        STAssertTrue([_mockDecoderDelegate.framesReceived[0] isKindOfClass:[SPDYSynStreamFrame class]], nil);
+    }
     [_mockDecoderDelegate clear];
 
     [self mockServerSynReplyWithId:streamId last:last];
 
-    // 2.1) We should not expect any protocol errors to be issued from the client.
+    // We should not expect any protocol errors to be issued from the client.
     STAssertNil(_mockDecoderDelegate.lastFrame, nil);
 
     return stream;

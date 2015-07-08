@@ -74,6 +74,30 @@
     STAssertEquals(metadata.streamId, (NSUInteger)1, nil);
     STAssertTrue(metadata.rxBytes > 0, nil);
     STAssertTrue(metadata.txBytes > 0, nil);
+    STAssertEquals(metadata.rxBodyBytes, (NSUInteger)0, nil);
+    STAssertEquals(metadata.txBodyBytes, (NSUInteger)0, nil);
+}
+
+- (void)testReceivedMetadataForSingleShortRequestWithBody
+{
+    // Exchange initial SYN_STREAM and SYN_REPLY
+    _URLRequest = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:@"https://mocked/init"]];
+    _URLRequest.HTTPMethod = @"POST";
+    _URLRequest.HTTPBody = [[NSMutableData alloc] initWithLength:1000];
+    [self mockSynStreamAndReplyWithId:1 last:NO];
+    [self mockServerDataWithId:1 data:[[NSMutableData alloc] initWithLength:2000] last:YES];
+
+    STAssertNil(_mockDecoderDelegate.lastFrame, nil);
+    STAssertTrue(_mockURLProtocolClient.calledDidFinishLoading, nil);
+    STAssertNotNil(_mockURLProtocolClient.lastResponse, nil);
+
+    SPDYMetadata *metadata = [SPDYProtocol metadataForResponse:_mockURLProtocolClient.lastResponse];
+    STAssertEqualObjects(metadata.version, @"3.1", nil);
+    STAssertEquals(metadata.streamId, (NSUInteger)1, nil);
+    STAssertTrue(metadata.rxBytes > 2008, nil);
+    STAssertTrue(metadata.txBytes > 1008, nil);
+    STAssertEquals(metadata.rxBodyBytes, (NSUInteger)2008, nil);
+    STAssertEquals(metadata.txBodyBytes, (NSUInteger)1008, nil);
 }
 
 - (void)testReceivedStreamTimingsMetadataForSingleShortRequest

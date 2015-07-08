@@ -139,12 +139,14 @@
         _data = _request.HTTPBody;
     } else if (_request.SPDYBodyFile) {
         _dataStream = [[NSInputStream alloc] initWithFileAtPath:_request.SPDYBodyFile];
-    } else if (_request.HTTPBodyStream) {
-        SPDY_WARNING(@"using HTTPBodyStream on a SPDY request is subject to a potentially fatal CFNetwork bug");
-        _dataStream = _request.HTTPBodyStream;
     } else if (_request.SPDYBodyStream) {
         SPDY_WARNING(@"using SPDYBodyStream may fail for redirected requests or requests that meet authentication challenges");
         _dataStream = _request.SPDYBodyStream;
+    } else if (_request.HTTPBodyStream) {
+        if (floor(NSFoundationVersionNumber) <= NSFoundationVersionNumber_iOS_6_1) {
+            SPDY_WARNING(@"using HTTPBodyStream on a SPDY request is subject to a potentially fatal CFNetwork bug in iOS 5 and iOS 6");
+        }
+        _dataStream = _request.HTTPBodyStream;
     }
 
     if (_dataStream) {
@@ -159,7 +161,7 @@
     // since no API exists to request a new stream
     if (_receivedReply ||
         _dispatchAttempts >= MAX_DISPATCH_ATTEMPTS ||
-        (_streamId && _request.HTTPBodyStream)) {
+        (_streamId && (_request.HTTPBodyStream || _request.SPDYBodyStream))) {
         return NO;
     }
 
@@ -260,10 +262,30 @@
             error = SPDY_SOCKET_ERROR(SPDYSocketTransportError, @"Unknown socket error.");
         }
 
+        NSString *errorDomain = error.domain;
+        NSInteger errorCode = error.code;
         NSMutableDictionary *userInfo = [[error userInfo] mutableCopy];
+
+        // We should map kCFErrorDomainCFNetwork errors to NSURLErrorDomain. All of
+        // NSURLErrorDomain's error codes are based on CFNetwork ones.
+        if ([errorDomain isEqualToString:(__bridge NSString *)kCFErrorDomainCFNetwork]) {
+            errorDomain = NSURLErrorDomain;
+            userInfo[NSUnderlyingErrorKey] = error;
+
+            // Handle some codes present in kCFErrorDomainCFNetwork but not NSURLErrorDomain.
+            switch (errorCode) {
+                case kCFHostErrorHostNotFound:
+                    errorCode = NSURLErrorCannotFindHost;
+                    break;
+                case kCFHostErrorUnknown:
+                    errorCode = NSURLErrorCannotConnectToHost;
+                    break;
+            }
+        }
+
         [SPDYMetadata setMetadata:_metadata forAssociatedDictionary:userInfo];
-        NSError *errorWithMetadata = [[NSError alloc] initWithDomain:error.domain
-                                                                code:error.code
+        NSError *errorWithMetadata = [[NSError alloc] initWithDomain:errorDomain
+                                                                code:errorCode
                                                             userInfo:userInfo];
 
         [_client URLProtocol:_protocol didFailWithError:errorWithMetadata];
