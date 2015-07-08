@@ -178,6 +178,42 @@
     STAssertEqualObjects([pushResponse.allHeaderFields valueForKey:@"PushHeader"], @"PushValue", nil);
 }
 
+- (void)testSYNStreamWithStreamIDNonZeroPostsNotification
+{
+    SPDYMockURLProtocolClient __block *pushClient = nil;
+
+    [[NSNotificationCenter defaultCenter] addObserverForName:SPDYPushRequestReceivedNotification object:nil queue:nil usingBlock:^(NSNotification *note) {
+        STAssertTrue([note.userInfo[@"request"] isKindOfClass:[NSURLRequest class]], nil);
+
+        NSURLRequest *request = note.userInfo[@"request"];
+        STAssertNotNil(request, nil);
+        STAssertEqualObjects(request.URL.absoluteString, @"http://mocked/pushed", nil);
+
+        pushClient = [self attachToPushRequest:request].client;
+    }];
+
+    // Exchange initial SYN_STREAM and SYN_REPLY
+    [self mockSynStreamAndReplyWithId:1 last:NO];
+
+    // Send SYN_STREAM from server to client. Notification posted at this point.
+    [self mockServerSynStreamWithId:2 last:NO];
+    STAssertNotNil(pushClient, nil);
+    STAssertFalse(pushClient.calledDidReceiveResponse, nil);
+
+    // Send HEADERS from server to client
+    [self mockServerHeadersFrameForPushWithId:2 last:NO];
+    STAssertTrue(pushClient.calledDidReceiveResponse, nil);
+    STAssertFalse(pushClient.calledDidLoadData, nil);
+    STAssertFalse(pushClient.calledDidFailWithError, nil);
+    STAssertFalse(pushClient.calledDidFinishLoading, nil);
+    
+    NSHTTPURLResponse *pushResponse = pushClient.lastResponse;
+    STAssertEqualObjects(pushResponse.URL.absoluteString, @"http://mocked/pushed", nil);
+    STAssertEquals(pushResponse.statusCode, 200, nil);
+    STAssertEqualObjects([pushResponse.allHeaderFields valueForKey:@"PushHeader"], @"PushValue", nil);
+
+}
+
 - (void)testSYNStreamAfterAssociatedStreamClosesRespondsWithGoAway
 {
     // Exchange initial SYN_STREAM and SYN_REPLY
