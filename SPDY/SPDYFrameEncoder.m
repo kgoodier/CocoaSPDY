@@ -32,7 +32,7 @@
     uint8_t *_compressed;
 }
 
-- (id)initWithDelegate:(id<SPDYFrameEncoderDelegate>)delegate headerCompressionLevel:(NSUInteger)headerCompressionLevel
+- (instancetype)initWithDelegate:(id<SPDYFrameEncoderDelegate>)delegate headerCompressionLevel:(NSUInteger)headerCompressionLevel
 {
     self = [super init];
     if (self) {
@@ -329,7 +329,7 @@
 
 - (bool)_writeString:(NSString*)value error:(NSError **)pError
 {
-    NSRange leftover;
+    NSRange leftover = { 0 };
     NSUInteger used = 0;
 
     [value getBytes:(_encodedHeaders + _encodedHeadersLength)

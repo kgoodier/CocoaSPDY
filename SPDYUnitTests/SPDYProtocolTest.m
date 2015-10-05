@@ -9,13 +9,13 @@
 //  Created by Kevin Goodier.
 //
 
-#import <SenTestingKit/SenTestingKit.h>
+#import <XCTest/XCTest.h>
 #import <Foundation/Foundation.h>
 #import "NSURLRequest+SPDYURLRequest.h"
 #import "SPDYProtocol.h"
 #import "SPDYTLSTrustEvaluator.h"
 
-@interface SPDYProtocolTest : SenTestCase<SPDYTLSTrustEvaluator>
+@interface SPDYProtocolTest : XCTestCase<SPDYTLSTrustEvaluator>
 @end
 
 @implementation SPDYProtocolTest
@@ -48,45 +48,45 @@
 
 - (void)testURLSessionCanInitTrue
 {
-    STAssertTrue([SPDYURLSessionProtocol canInitWithRequest:[self makeRequest:@"https://api.twitter.com"]], nil);
-    STAssertTrue([SPDYURLSessionProtocol canInitWithRequest:[self makeRequest:@"https://api.twitter.com/foo"]], nil);
-    STAssertTrue([SPDYURLSessionProtocol canInitWithRequest:[self makeRequest:@"https://api.twitter.com:443/foo"]], nil);
-    STAssertTrue([SPDYURLSessionProtocol canInitWithRequest:[self makeRequest:@"https://api.twitter.com:8888/foo"]], nil);
-    STAssertTrue([SPDYURLSessionProtocol canInitWithRequest:[self makeRequest:@"http://api.twitter.com/foo"]], nil);
+    XCTAssertTrue([SPDYURLSessionProtocol canInitWithRequest:[self makeRequest:@"https://api.twitter.com"]]);
+    XCTAssertTrue([SPDYURLSessionProtocol canInitWithRequest:[self makeRequest:@"https://api.twitter.com/foo"]]);
+    XCTAssertTrue([SPDYURLSessionProtocol canInitWithRequest:[self makeRequest:@"https://api.twitter.com:443/foo"]]);
+    XCTAssertTrue([SPDYURLSessionProtocol canInitWithRequest:[self makeRequest:@"https://api.twitter.com:8888/foo"]]);
+    XCTAssertTrue([SPDYURLSessionProtocol canInitWithRequest:[self makeRequest:@"http://api.twitter.com/foo"]]);
 }
 
 - (void)testURLSessionCanInitFalse
 {
-    STAssertFalse([SPDYURLSessionProtocol canInitWithRequest:[self makeRequest:@"ftp://api.twitter.com"]], nil);
-    STAssertFalse([SPDYURLSessionProtocol canInitWithRequest:[self makeRequest:@"://api.twitter.com"]], nil);
-    STAssertFalse([SPDYURLSessionProtocol canInitWithRequest:[self makeRequest:@"api.twitter.com"]], nil);
+    XCTAssertFalse([SPDYURLSessionProtocol canInitWithRequest:[self makeRequest:@"ftp://api.twitter.com"]]);
+    XCTAssertFalse([SPDYURLSessionProtocol canInitWithRequest:[self makeRequest:@"://api.twitter.com"]]);
+    XCTAssertFalse([SPDYURLSessionProtocol canInitWithRequest:[self makeRequest:@"api.twitter.com"]]);
 }
 
 - (void)testURLSessionWithBypassCanInitFalse
 {
     NSMutableURLRequest *request = [self makeRequest:@"https://api.twitter.com"];
     request.SPDYBypass = YES;
-    STAssertFalse([SPDYURLSessionProtocol canInitWithRequest:request], nil);
+    XCTAssertFalse([SPDYURLSessionProtocol canInitWithRequest:request]);
 }
 
 - (void)testURLConnectionCanInitTrue
 {
     [SPDYURLConnectionProtocol registerOrigin:@"https://api.twitter.com"];
-    STAssertTrue([SPDYURLConnectionProtocol canInitWithRequest:[self makeRequest:@"https://api.twitter.com"]], nil);
-    STAssertTrue([SPDYURLConnectionProtocol canInitWithRequest:[self makeRequest:@"https://api.twitter.com/foo"]], nil);
-    STAssertTrue([SPDYURLConnectionProtocol canInitWithRequest:[self makeRequest:@"https://api.twitter.com:443/foo"]], nil);
+    XCTAssertTrue([SPDYURLConnectionProtocol canInitWithRequest:[self makeRequest:@"https://api.twitter.com"]]);
+    XCTAssertTrue([SPDYURLConnectionProtocol canInitWithRequest:[self makeRequest:@"https://api.twitter.com/foo"]]);
+    XCTAssertTrue([SPDYURLConnectionProtocol canInitWithRequest:[self makeRequest:@"https://api.twitter.com:443/foo"]]);
 }
 
 - (void)testURLConnectionCanInitFalse
 {
     [SPDYURLConnectionProtocol registerOrigin:@"https://api.twitter.com"];
-    STAssertFalse([SPDYURLConnectionProtocol canInitWithRequest:[self makeRequest:@"https://api.twitter.com:8888/foo"]], nil);
-    STAssertFalse([SPDYURLConnectionProtocol canInitWithRequest:[self makeRequest:@"http://api.twitter.com"]], nil);
-    STAssertFalse([SPDYURLConnectionProtocol canInitWithRequest:[self makeRequest:@"https://twitter.com"]], nil);
-    STAssertFalse([SPDYURLConnectionProtocol canInitWithRequest:[self makeRequest:@"https://foo.api.twitter.com"]], nil);
-    STAssertFalse([SPDYURLConnectionProtocol canInitWithRequest:[self makeRequest:@"https://twitter.com:80"]], nil);
-    STAssertFalse([SPDYURLConnectionProtocol canInitWithRequest:[self makeRequest:@"http://api.twitter.com:443"]], nil);
-    STAssertFalse([SPDYURLConnectionProtocol canInitWithRequest:[self makeRequest:@"://api.twitter.com"]], nil);
+    XCTAssertFalse([SPDYURLConnectionProtocol canInitWithRequest:[self makeRequest:@"https://api.twitter.com:8888/foo"]]);
+    XCTAssertFalse([SPDYURLConnectionProtocol canInitWithRequest:[self makeRequest:@"http://api.twitter.com"]]);
+    XCTAssertFalse([SPDYURLConnectionProtocol canInitWithRequest:[self makeRequest:@"https://twitter.com"]]);
+    XCTAssertFalse([SPDYURLConnectionProtocol canInitWithRequest:[self makeRequest:@"https://foo.api.twitter.com"]]);
+    XCTAssertFalse([SPDYURLConnectionProtocol canInitWithRequest:[self makeRequest:@"https://twitter.com:80"]]);
+    XCTAssertFalse([SPDYURLConnectionProtocol canInitWithRequest:[self makeRequest:@"http://api.twitter.com:443"]]);
+    XCTAssertFalse([SPDYURLConnectionProtocol canInitWithRequest:[self makeRequest:@"://api.twitter.com"]]);
 }
 
 - (void)testURLConnectionWithBypassCanInitFalse
@@ -94,7 +94,7 @@
     [SPDYURLConnectionProtocol registerOrigin:@"https://api.twitter.com"];
     NSMutableURLRequest *request = [self makeRequest:@"https://api.twitter.com"];
     request.SPDYBypass = YES;
-    STAssertFalse([SPDYURLSessionProtocol canInitWithRequest:request], nil);
+    XCTAssertFalse([SPDYURLSessionProtocol canInitWithRequest:request]);
 }
 
 - (void)testURLConnectionAliasCanInitTrue
@@ -104,10 +104,10 @@
     [SPDYProtocol registerAlias:@"https://alias.twitter.com" forOrigin:@"https://api.twitter.com"];
     [SPDYProtocol registerAlias:@"https://bare.twitter.com" forOrigin:@"https://1.2.3.4"];
 
-    STAssertTrue([SPDYURLConnectionProtocol canInitWithRequest:[self makeRequest:@"https://api.twitter.com/foo"]], nil);
-    STAssertTrue([SPDYURLConnectionProtocol canInitWithRequest:[self makeRequest:@"https://1.2.3.4/foo"]], nil);
-    STAssertTrue([SPDYURLConnectionProtocol canInitWithRequest:[self makeRequest:@"https://alias.twitter.com/foo"]], nil);
-    STAssertTrue([SPDYURLConnectionProtocol canInitWithRequest:[self makeRequest:@"https://bare.twitter.com/foo"]], nil);
+    XCTAssertTrue([SPDYURLConnectionProtocol canInitWithRequest:[self makeRequest:@"https://api.twitter.com/foo"]]);
+    XCTAssertTrue([SPDYURLConnectionProtocol canInitWithRequest:[self makeRequest:@"https://1.2.3.4/foo"]]);
+    XCTAssertTrue([SPDYURLConnectionProtocol canInitWithRequest:[self makeRequest:@"https://alias.twitter.com/foo"]]);
+    XCTAssertTrue([SPDYURLConnectionProtocol canInitWithRequest:[self makeRequest:@"https://bare.twitter.com/foo"]]);
 
     // TODO: Replace with unregisterAllAliases when available
     [SPDYProtocol unregisterAlias:@"https://alias.twitter.com"];
@@ -120,10 +120,10 @@
     [SPDYProtocol registerAlias:@"https://alias.twitter.com" forOrigin:@"https://api.twitter.com"];
     [SPDYProtocol registerAlias:@"https://bare.twitter.com" forOrigin:@"https://1.2.3.4"];
 
-    STAssertFalse([SPDYURLConnectionProtocol canInitWithRequest:[self makeRequest:@"https://api.twitter.com/foo"]], nil);
-    STAssertFalse([SPDYURLConnectionProtocol canInitWithRequest:[self makeRequest:@"https://1.2.3.4/foo"]], nil);
-    STAssertFalse([SPDYURLConnectionProtocol canInitWithRequest:[self makeRequest:@"https://alias.twitter.com/foo"]], nil);
-    STAssertFalse([SPDYURLConnectionProtocol canInitWithRequest:[self makeRequest:@"https://bare.twitter.com/foo"]], nil);
+    XCTAssertFalse([SPDYURLConnectionProtocol canInitWithRequest:[self makeRequest:@"https://api.twitter.com/foo"]]);
+    XCTAssertFalse([SPDYURLConnectionProtocol canInitWithRequest:[self makeRequest:@"https://1.2.3.4/foo"]]);
+    XCTAssertFalse([SPDYURLConnectionProtocol canInitWithRequest:[self makeRequest:@"https://alias.twitter.com/foo"]]);
+    XCTAssertFalse([SPDYURLConnectionProtocol canInitWithRequest:[self makeRequest:@"https://bare.twitter.com/foo"]]);
 
     // TODO: Replace with unregisterAllAliases when available
     [SPDYProtocol unregisterAlias:@"https://alias.twitter.com"];
@@ -135,7 +135,7 @@
     [SPDYURLConnectionProtocol registerOrigin:@"https://api.twitter.com"];
     [SPDYProtocol registerAlias:@"ftp://alias.twitter.com" forOrigin:@"https://api.twitter.com"]; // bad alias
 
-    STAssertFalse([SPDYURLConnectionProtocol canInitWithRequest:[self makeRequest:@"ftp://alias.twitter.com/foo"]], nil);
+    XCTAssertFalse([SPDYURLConnectionProtocol canInitWithRequest:[self makeRequest:@"ftp://alias.twitter.com/foo"]]);
 
     // TODO: Replace with unregisterAllAliases when available
     [SPDYProtocol unregisterAlias:@"ftp://alias.twitter.com"];
@@ -144,54 +144,54 @@
 - (void)testURLConnectionCanInitTrueAfterWeirdOrigins
 {
     [SPDYURLConnectionProtocol registerOrigin:@"https://api.twitter.com:8888"];
-    STAssertTrue([SPDYURLConnectionProtocol canInitWithRequest:[self makeRequest:@"https://api.twitter.com:8888/foo"]], nil);
-    STAssertFalse([SPDYURLConnectionProtocol canInitWithRequest:[self makeRequest:@"https://api.twitter.com/foo"]], nil);
+    XCTAssertTrue([SPDYURLConnectionProtocol canInitWithRequest:[self makeRequest:@"https://api.twitter.com:8888/foo"]]);
+    XCTAssertFalse([SPDYURLConnectionProtocol canInitWithRequest:[self makeRequest:@"https://api.twitter.com/foo"]]);
 
     [SPDYURLConnectionProtocol registerOrigin:@"https://api.twitter.com"];
-    STAssertTrue([SPDYURLConnectionProtocol canInitWithRequest:[self makeRequest:@"https://api.twitter.com:8888/foo"]], nil);
-    STAssertTrue([SPDYURLConnectionProtocol canInitWithRequest:[self makeRequest:@"https://api.twitter.com/foo"]], nil);
-    STAssertFalse([SPDYURLConnectionProtocol canInitWithRequest:[self makeRequest:@"https://api.twitter.com:8889/foo"]], nil);
+    XCTAssertTrue([SPDYURLConnectionProtocol canInitWithRequest:[self makeRequest:@"https://api.twitter.com:8888/foo"]]);
+    XCTAssertTrue([SPDYURLConnectionProtocol canInitWithRequest:[self makeRequest:@"https://api.twitter.com/foo"]]);
+    XCTAssertFalse([SPDYURLConnectionProtocol canInitWithRequest:[self makeRequest:@"https://api.twitter.com:8889/foo"]]);
 
     [SPDYURLConnectionProtocol registerOrigin:@"https://www.twitter.com/foo"];
-    STAssertTrue([SPDYURLConnectionProtocol canInitWithRequest:[self makeRequest:@"https://www.twitter.com/foo"]], nil);
-    STAssertTrue([SPDYURLConnectionProtocol canInitWithRequest:[self makeRequest:@"https://www.twitter.com"]], nil);
+    XCTAssertTrue([SPDYURLConnectionProtocol canInitWithRequest:[self makeRequest:@"https://www.twitter.com/foo"]]);
+    XCTAssertTrue([SPDYURLConnectionProtocol canInitWithRequest:[self makeRequest:@"https://www.twitter.com"]]);
 }
 
 - (void)testURLConnectionCanInitFalseAfterBadOrigins
 {
     [SPDYURLConnectionProtocol registerOrigin:@"ftp://api.twitter.com"];
-    STAssertFalse([SPDYURLConnectionProtocol canInitWithRequest:[self makeRequest:@"https://api.twitter.com/foo"]], nil);
-    STAssertFalse([SPDYURLConnectionProtocol canInitWithRequest:[self makeRequest:@"ftp://api.twitter.com/foo"]], nil);
+    XCTAssertFalse([SPDYURLConnectionProtocol canInitWithRequest:[self makeRequest:@"https://api.twitter.com/foo"]]);
+    XCTAssertFalse([SPDYURLConnectionProtocol canInitWithRequest:[self makeRequest:@"ftp://api.twitter.com/foo"]]);
 
     [SPDYURLConnectionProtocol registerOrigin:@"https://"];
-    STAssertFalse([SPDYURLConnectionProtocol canInitWithRequest:[self makeRequest:@"https://"]], nil);
+    XCTAssertFalse([SPDYURLConnectionProtocol canInitWithRequest:[self makeRequest:@"https://"]]);
 }
 
 - (void)testURLConnectionCanInitFalseAfterUnregister
 {
     [SPDYURLConnectionProtocol registerOrigin:@"https://api.twitter.com"];
     [SPDYURLConnectionProtocol registerOrigin:@"https://www.twitter.com"];
-    STAssertTrue([SPDYURLConnectionProtocol canInitWithRequest:[self makeRequest:@"https://api.twitter.com"]], nil);
-    STAssertTrue([SPDYURLConnectionProtocol canInitWithRequest:[self makeRequest:@"https://www.twitter.com"]], nil);
+    XCTAssertTrue([SPDYURLConnectionProtocol canInitWithRequest:[self makeRequest:@"https://api.twitter.com"]]);
+    XCTAssertTrue([SPDYURLConnectionProtocol canInitWithRequest:[self makeRequest:@"https://www.twitter.com"]]);
 
     [SPDYURLConnectionProtocol unregisterOrigin:@"https://api.twitter.com"];
-    STAssertFalse([SPDYURLConnectionProtocol canInitWithRequest:[self makeRequest:@"https://api.twitter.com"]], nil);
-    STAssertTrue([SPDYURLConnectionProtocol canInitWithRequest:[self makeRequest:@"https://www.twitter.com"]], nil);
+    XCTAssertFalse([SPDYURLConnectionProtocol canInitWithRequest:[self makeRequest:@"https://api.twitter.com"]]);
+    XCTAssertTrue([SPDYURLConnectionProtocol canInitWithRequest:[self makeRequest:@"https://www.twitter.com"]]);
 
     [SPDYURLConnectionProtocol unregisterAllOrigins];
-    STAssertFalse([SPDYURLConnectionProtocol canInitWithRequest:[self makeRequest:@"https://www.twitter.com"]], nil);
+    XCTAssertFalse([SPDYURLConnectionProtocol canInitWithRequest:[self makeRequest:@"https://www.twitter.com"]]);
 }
 
 - (void)testTLSTrustEvaluatorReturnsYesWhenNotSet
 {
-    STAssertTrue([SPDYProtocol evaluateServerTrust:nil forHost:@"api.twitter.com"], nil);
+    XCTAssertTrue([SPDYProtocol evaluateServerTrust:nil forHost:@"api.twitter.com"]);
 }
 
 - (void)testTLSTrustEvaluator
 {
     [SPDYProtocol setTLSTrustEvaluator:self];
-    STAssertFalse([SPDYProtocol evaluateServerTrust:nil forHost:@"api.twitter.com"], nil);
-    STAssertEqualObjects(_lastTLSTrustHost, @"api.twitter.com", nil);
+    XCTAssertFalse([SPDYProtocol evaluateServerTrust:nil forHost:@"api.twitter.com"]);
+    XCTAssertEqualObjects(_lastTLSTrustHost, @"api.twitter.com");
 }
 
 - (void)testTLSTrustEvaluatorWithCertificateAlias
@@ -202,11 +202,11 @@
     [SPDYProtocol registerAlias:@"https://alias.twitter.com" forOrigin:@"https://api.twitter.com"];
     [SPDYProtocol registerAlias:@"https://bare.twitter.com" forOrigin:@"https://1.2.3.4"];
 
-    STAssertFalse([SPDYProtocol evaluateServerTrust:nil forHost:@"api.twitter.com"], nil);
-    STAssertEqualObjects(_lastTLSTrustHost, @"api.twitter.com", nil);
+    XCTAssertFalse([SPDYProtocol evaluateServerTrust:nil forHost:@"api.twitter.com"]);
+    XCTAssertEqualObjects(_lastTLSTrustHost, @"api.twitter.com");
 
-    STAssertFalse([SPDYProtocol evaluateServerTrust:nil forHost:@"1.2.3.4"], nil);
-    STAssertEqualObjects(_lastTLSTrustHost, @"bare.twitter.com", nil);
+    XCTAssertFalse([SPDYProtocol evaluateServerTrust:nil forHost:@"1.2.3.4"]);
+    XCTAssertEqualObjects(_lastTLSTrustHost, @"bare.twitter.com");
 
     // TODO: Replace with unregisterAllAliases when available
     [SPDYProtocol unregisterAlias:@"https://alias.twitter.com"];
@@ -228,14 +228,14 @@
     [SPDYProtocol setConfiguration:c1];
     SPDYConfiguration *c2 = [SPDYProtocol currentConfiguration];
 
-    STAssertEquals(c2.sessionPoolSize, (NSUInteger)4, nil);
-    STAssertEquals(c2.sessionReceiveWindow, (NSUInteger)2000, nil);
-    STAssertEquals(c2.streamReceiveWindow, (NSUInteger)1000, nil);
-    STAssertEquals(c2.headerCompressionLevel, (NSUInteger)5, nil);
-    STAssertEquals(c2.enableSettingsMinorVersion, NO, nil);
-    STAssertEquals(c2.tlsSettings[@"Key1"], @"Value1", nil);
-    STAssertEquals(c2.connectTimeout, 1.0, nil);
-    STAssertEquals(c2.enableTCPNoDelay, YES, nil);
+    XCTAssertEqual(c2.sessionPoolSize, (NSUInteger)4);
+    XCTAssertEqual(c2.sessionReceiveWindow, (NSUInteger)2000);
+    XCTAssertEqual(c2.streamReceiveWindow, (NSUInteger)1000);
+    XCTAssertEqual(c2.headerCompressionLevel, (NSUInteger)5);
+    XCTAssertEqual(c2.enableSettingsMinorVersion, NO);
+    XCTAssertEqual(c2.tlsSettings[@"Key1"], @"Value1");
+    XCTAssertEqual(c2.connectTimeout, 1.0);
+    XCTAssertEqual(c2.enableTCPNoDelay, YES);
 
     // Reset
     [SPDYProtocol setConfiguration:[SPDYConfiguration defaultConfiguration]];
@@ -250,24 +250,24 @@
     NSMutableURLRequest *request2 = [[NSMutableURLRequest alloc] initWithURL:url2];
     NSMutableURLRequest *request3 = [[NSMutableURLRequest alloc] initWithURL:url3];
 
-    STAssertFalse([SPDYURLConnectionProtocol canInitWithRequest:request1], nil);
-    STAssertFalse([SPDYURLConnectionProtocol canInitWithRequest:request2], nil);
-    STAssertFalse([SPDYURLConnectionProtocol canInitWithRequest:request3], nil);
+    XCTAssertFalse([SPDYURLConnectionProtocol canInitWithRequest:request1]);
+    XCTAssertFalse([SPDYURLConnectionProtocol canInitWithRequest:request2]);
+    XCTAssertFalse([SPDYURLConnectionProtocol canInitWithRequest:request3]);
 
     [SPDYURLConnectionProtocol registerOrigin:@"https://mocked.com:443"];
     [SPDYURLConnectionProtocol registerOrigin:@"https://mocked.com:8443"];
-    STAssertTrue([SPDYURLConnectionProtocol canInitWithRequest:request1], nil);
-    STAssertTrue([SPDYURLConnectionProtocol canInitWithRequest:request2], nil);
-    STAssertFalse([SPDYURLConnectionProtocol canInitWithRequest:request3], nil);
+    XCTAssertTrue([SPDYURLConnectionProtocol canInitWithRequest:request1]);
+    XCTAssertTrue([SPDYURLConnectionProtocol canInitWithRequest:request2]);
+    XCTAssertFalse([SPDYURLConnectionProtocol canInitWithRequest:request3]);
 
     [SPDYURLConnectionProtocol unregisterOrigin:@"https://mocked.com:8443"];
-    STAssertTrue([SPDYURLConnectionProtocol canInitWithRequest:request1], nil);
-    STAssertFalse([SPDYURLConnectionProtocol canInitWithRequest:request2], nil);
-    STAssertFalse([SPDYURLConnectionProtocol canInitWithRequest:request3], nil);
+    XCTAssertTrue([SPDYURLConnectionProtocol canInitWithRequest:request1]);
+    XCTAssertFalse([SPDYURLConnectionProtocol canInitWithRequest:request2]);
+    XCTAssertFalse([SPDYURLConnectionProtocol canInitWithRequest:request3]);
 
     [SPDYURLConnectionProtocol unregisterAllOrigins];
     [SPDYURLConnectionProtocol unregisterAllAliases];
-    STAssertFalse([SPDYURLConnectionProtocol canInitWithRequest:request1], nil);
+    XCTAssertFalse([SPDYURLConnectionProtocol canInitWithRequest:request1]);
 }
 
 @end

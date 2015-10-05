@@ -8,7 +8,7 @@
 //  Created by Michael Schore and Jeffrey Pinner.
 //
 
-#import <SenTestingKit/SenTestingKit.h>
+#import <XCTest/XCTest.h>
 #import "NSURLRequest+SPDYURLRequest.h"
 #import "SPDYStream.h"
 #import "SPDYMockSessionTestBase.h"
@@ -44,7 +44,7 @@ static NSThread *_streamThread;
         [producedData appendData:[spdyStream readData:10 error:nil]];
     }
 
-    STAssertTrue([producedData isEqualToData:_uploadData], nil);
+    XCTAssertTrue([producedData isEqualToData:_uploadData]);
 }
 
 - (void)testStreamingWithStream
@@ -60,9 +60,9 @@ static NSThread *_streamThread;
         dispatch_semaphore_signal(main);
     };
 
-    STAssertTrue([NSThread isMainThread], @"dispatch must occur from main thread");
+    XCTAssertTrue([NSThread isMainThread], @"dispatch must occur from main thread");
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-        STAssertFalse([NSThread isMainThread], @"stream must be scheduled off main thread");
+        XCTAssertFalse([NSThread isMainThread], @"stream must be scheduled off main thread");
 
         [spdyStream startWithStreamId:1 sendWindowSize:1024 receiveWindowSize:1024];
 
@@ -78,14 +78,14 @@ static NSThread *_streamThread;
         CFRunLoopRunInMode(kCFRunLoopDefaultMode, 0, YES);
     }
 
-    STAssertTrue([mockDelegate.data isEqualToData:_uploadData], nil);
+    XCTAssertTrue([mockDelegate.data isEqualToData:_uploadData]);
 }
 
 #define SPDYAssertStreamError(errorDomain, errorCode) do { \
-    STAssertTrue(_mockURLProtocolClient.calledDidFailWithError, nil); \
-    STAssertNotNil(_mockURLProtocolClient.lastError, nil); \
-    STAssertEqualObjects(_mockURLProtocolClient.lastError.domain, (errorDomain), nil); \
-    STAssertEquals(_mockURLProtocolClient.lastError.code, (errorCode), nil); \
+    XCTAssertTrue(_mockURLProtocolClient.calledDidFailWithError); \
+    XCTAssertNotNil(_mockURLProtocolClient.lastError); \
+    XCTAssertEqualObjects(_mockURLProtocolClient.lastError.domain, (errorDomain)); \
+    XCTAssertEqual(_mockURLProtocolClient.lastError.code, (errorCode)); \
 } while (0)
 
 - (void)testMergeHeadersCollisionDoesAbort
@@ -98,7 +98,7 @@ static NSThread *_streamThread;
     NSDictionary *headersDup = @{@":scheme":@"http"};
 
     [stream mergeHeaders:headers];
-    STAssertFalse(_mockURLProtocolClient.calledDidFailWithError, nil);
+    XCTAssertFalse(_mockURLProtocolClient.calledDidFailWithError);
 
     [stream mergeHeaders:headersDup];
     SPDYAssertStreamError(SPDYStreamErrorDomain, SPDYStreamProtocolError);
@@ -154,15 +154,15 @@ static NSThread *_streamThread;
 
     [stream mergeHeaders:headers];
     [stream didReceiveResponse];
-    STAssertTrue(_mockURLProtocolClient.calledDidReceiveResponse, nil);
+    XCTAssertTrue(_mockURLProtocolClient.calledDidReceiveResponse);
 
     NSHTTPURLResponse *response = _mockURLProtocolClient.lastResponse;
-    STAssertNotNil(response, nil);
+    XCTAssertNotNil(response);
 
     // Note: metadata adds a header
-    STAssertTrue(response.allHeaderFields.count <= (NSUInteger)3, nil);
-    STAssertEqualObjects(response.allHeaderFields[@"Header1"], @"Value1", nil);
-    STAssertEqualObjects(response.allHeaderFields[@"HeaderMany"], @"ValueMany1, ValueMany2", nil);
+    XCTAssertTrue(response.allHeaderFields.count <= (NSUInteger)3);
+    XCTAssertEqualObjects(response.allHeaderFields[@"Header1"], @"Value1");
+    XCTAssertEqualObjects(response.allHeaderFields[@"HeaderMany"], @"ValueMany1, ValueMany2");
 }
 
 - (void)testReceiveResponseWithLocationDoesRedirect
@@ -183,15 +183,15 @@ static NSThread *_streamThread;
 
     [stream mergeHeaders:headers];
     [stream didReceiveResponse];
-    STAssertTrue(_mockURLProtocolClient.calledWasRedirectedToRequest, nil);
+    XCTAssertTrue(_mockURLProtocolClient.calledWasRedirectedToRequest);
 
-    STAssertEqualObjects(_mockURLProtocolClient.lastRedirectedRequest.URL.absoluteString, redirectUrl.absoluteString, nil);
-    STAssertEquals(_mockURLProtocolClient.lastRedirectedRequest.SPDYPriority, (NSUInteger)3, nil);
-    STAssertEqualObjects(_mockURLProtocolClient.lastRedirectedRequest.HTTPMethod, @"POST", nil);
-    STAssertEqualObjects(_mockURLProtocolClient.lastRedirectedRequest.SPDYBodyFile, @"bodyfile.txt", nil);
-    STAssertEquals(_mockURLProtocolClient.lastRedirectedRequest.SPDYDeferrableInterval, 1.0, nil);
+    XCTAssertEqualObjects(_mockURLProtocolClient.lastRedirectedRequest.URL.absoluteString, redirectUrl.absoluteString);
+    XCTAssertEqual(_mockURLProtocolClient.lastRedirectedRequest.SPDYPriority, (NSUInteger)3);
+    XCTAssertEqualObjects(_mockURLProtocolClient.lastRedirectedRequest.HTTPMethod, @"POST");
+    XCTAssertEqualObjects(_mockURLProtocolClient.lastRedirectedRequest.SPDYBodyFile, @"bodyfile.txt");
+    XCTAssertEqual(_mockURLProtocolClient.lastRedirectedRequest.SPDYDeferrableInterval, 1.0);
 
-    STAssertEqualObjects(((NSHTTPURLResponse *)_mockURLProtocolClient.lastRedirectResponse).allHeaderFields[@"Header1"], @"Value1", nil);
+    XCTAssertEqualObjects(((NSHTTPURLResponse *)_mockURLProtocolClient.lastRedirectResponse).allHeaderFields[@"Header1"], @"Value1");
 }
 
 - (void)testReceiveResponseWithLocationAnd303DoesRedirect
@@ -212,11 +212,11 @@ static NSThread *_streamThread;
 
     [stream mergeHeaders:headers];
     [stream didReceiveResponse];
-    STAssertTrue(_mockURLProtocolClient.calledWasRedirectedToRequest, nil);
+    XCTAssertTrue(_mockURLProtocolClient.calledWasRedirectedToRequest);
 
-    STAssertEqualObjects(_mockURLProtocolClient.lastRedirectedRequest.URL.absoluteString, redirectUrl.absoluteString, nil);
-    STAssertEqualObjects(_mockURLProtocolClient.lastRedirectedRequest.HTTPMethod, @"GET", @"expect GET after 303");  // 303 means GET
-    STAssertNil(_mockURLProtocolClient.lastRedirectedRequest.SPDYBodyStream, nil);  // GET request must not have a body
+    XCTAssertEqualObjects(_mockURLProtocolClient.lastRedirectedRequest.URL.absoluteString, redirectUrl.absoluteString);
+    XCTAssertEqualObjects(_mockURLProtocolClient.lastRedirectedRequest.HTTPMethod, @"GET", @"expect GET after 303");  // 303 means GET
+    XCTAssertNil(_mockURLProtocolClient.lastRedirectedRequest.SPDYBodyStream);  // GET request must not have a body
 }
 
 @end

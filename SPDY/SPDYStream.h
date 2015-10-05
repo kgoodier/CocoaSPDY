@@ -50,8 +50,8 @@
 @property (nonatomic) uint32_t sendWindowSizeLowerBound;
 @property (nonatomic) uint32_t receiveWindowSizeLowerBound;
 
-- (id)initWithProtocol:(SPDYProtocol *)protocol pushStreamManager:(SPDYPushStreamManager *)pushStreamManager;
-- (id)initWithAssociatedStream:(SPDYStream *)associatedStream priority:(uint8_t)priority;
+- (instancetype)initWithProtocol:(SPDYProtocol *)protocol pushStreamManager:(SPDYPushStreamManager *)pushStreamManager;
+- (instancetype)initWithAssociatedStream:(SPDYStream *)associatedStream priority:(uint8_t)priority;
 - (void)startWithStreamId:(SPDYStreamId)id sendWindowSize:(uint32_t)sendWindowSize receiveWindowSize:(uint32_t)receiveWindowSize;
 - (bool)reset;
 - (NSData *)readData:(NSUInteger)length error:(NSError **)pError;

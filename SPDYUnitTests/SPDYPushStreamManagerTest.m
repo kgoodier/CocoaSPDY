@@ -9,7 +9,7 @@
 //  Created by Kevin Goodier.
 //
 
-#import <SenTestingKit/SenTestingKit.h>
+#import <XCTest/XCTest.h>
 #import "SPDYMockSessionTestBase.h"
 #import "SPDYPushStreamManager.h"
 #import "SPDYMockURLProtocolClient.h"
@@ -55,8 +55,8 @@
     [_pushStreamManager addStream:_pushStream1 associatedWith:_associatedStream];
     [_pushStreamManager addStream:_pushStream2 associatedWith:_associatedStream];
 
-    STAssertEquals(_pushStreamManager.pushStreamCount, 2U, nil);
-    STAssertEquals(_pushStreamManager.associatedStreamCount, 1U, nil);
+    XCTAssertEqual(_pushStreamManager.pushStreamCount, 2U);
+    XCTAssertEqual(_pushStreamManager.associatedStreamCount, 1U);
 }
 
 - (void)testStreamForProtocolNotFound
@@ -66,7 +66,7 @@
     SPDYProtocol *pushProtocolRequest = [[SPDYProtocol alloc] initWithRequest:pushURLRequest cachedResponse:nil client:mockPushURLProtocolClient];
 
     SPDYStream *pushStream = [_pushStreamManager streamForProtocol:pushProtocolRequest];
-    STAssertNil(pushStream, nil);
+    XCTAssertNil(pushStream);
 }
 
 - (void)testAttachToPushRequestWillAttachToPushStream
@@ -74,16 +74,16 @@
     [self _addTwoPushStreams];
 
     SPDYStream *pushStream = [self attachToPushRequestWithUrl:@"http://mocked/pushed"];
-    STAssertNotNil(pushStream, nil);
-    STAssertEqualObjects(pushStream.request.URL.absoluteString, @"http://mocked/pushed", nil);
-    STAssertEquals(_pushStreamManager.pushStreamCount, 1U, nil);
-    STAssertEquals(_pushStreamManager.associatedStreamCount, 1U, nil);
+    XCTAssertNotNil(pushStream);
+    XCTAssertEqualObjects(pushStream.request.URL.absoluteString, @"http://mocked/pushed");
+    XCTAssertEqual(_pushStreamManager.pushStreamCount, 1U);
+    XCTAssertEqual(_pushStreamManager.associatedStreamCount, 1U);
 
     pushStream = [self attachToPushRequestWithUrl:@"http://mocked/pushed2"];
-    STAssertNotNil(pushStream, nil);
-    STAssertEqualObjects(pushStream.request.URL.absoluteString, @"http://mocked/pushed2", nil);
-    STAssertEquals(_pushStreamManager.pushStreamCount, 0U, nil);
-    STAssertEquals(_pushStreamManager.associatedStreamCount, 1U, nil);
+    XCTAssertNotNil(pushStream);
+    XCTAssertEqualObjects(pushStream.request.URL.absoluteString, @"http://mocked/pushed2");
+    XCTAssertEqual(_pushStreamManager.pushStreamCount, 0U);
+    XCTAssertEqual(_pushStreamManager.associatedStreamCount, 1U);
 }
 
 - (void)testAttachToPushRequestWillNotAttachToAssociatedStream
@@ -91,9 +91,9 @@
     [self _addTwoPushStreams];
 
     SPDYStream *pushStream = [self attachToPushRequestWithUrl:@"http://mocked/init"];
-    STAssertNil(pushStream, nil);
-    STAssertEquals(_pushStreamManager.pushStreamCount, 2U, nil);
-    STAssertEquals(_pushStreamManager.associatedStreamCount, 1U, nil);
+    XCTAssertNil(pushStream);
+    XCTAssertEqual(_pushStreamManager.pushStreamCount, 2U);
+    XCTAssertEqual(_pushStreamManager.associatedStreamCount, 1U);
 }
 
 - (void)testAttachToPushRequestWillAttachToPushStreamAfterStopLoadingPushStream
@@ -102,21 +102,21 @@
 
     // Since the associated stream is still alive, this push stream will live on
     [_pushStreamManager stopLoadingStream:_pushStream1];
-    STAssertEquals(_pushStreamManager.pushStreamCount, 2U, nil);
-    STAssertEquals(_pushStreamManager.associatedStreamCount, 1U, nil);
+    XCTAssertEqual(_pushStreamManager.pushStreamCount, 2U);
+    XCTAssertEqual(_pushStreamManager.associatedStreamCount, 1U);
 
     SPDYStream *pushStream = [self attachToPushRequestWithUrl:@"http://mocked/pushed"];
-    STAssertNotNil(pushStream, nil);
-    STAssertEquals(_pushStreamManager.pushStreamCount, 1U, nil);
+    XCTAssertNotNil(pushStream);
+    XCTAssertEqual(_pushStreamManager.pushStreamCount, 1U);
 
     pushStream = [self attachToPushRequestWithUrl:@"http://mocked/pushed2"];
-    STAssertNotNil(pushStream, nil);
-    STAssertEqualObjects(pushStream.request.URL.absoluteString, @"http://mocked/pushed2", nil);
-    STAssertEquals(_pushStreamManager.pushStreamCount, 0U, nil);
-    STAssertEquals(_pushStreamManager.associatedStreamCount, 1U, nil);
+    XCTAssertNotNil(pushStream);
+    XCTAssertEqualObjects(pushStream.request.URL.absoluteString, @"http://mocked/pushed2");
+    XCTAssertEqual(_pushStreamManager.pushStreamCount, 0U);
+    XCTAssertEqual(_pushStreamManager.associatedStreamCount, 1U);
 
     [_pushStreamManager stopLoadingStream:_associatedStream];
-    STAssertEquals(_pushStreamManager.associatedStreamCount, 0U, nil);
+    XCTAssertEqual(_pushStreamManager.associatedStreamCount, 0U);
 }
 
 - (void)testAttachToPushRequestWillNotAttachToPushStreamAfterStopLoadingAssociatedStream
@@ -124,8 +124,8 @@
     [self _addTwoPushStreams];
 
     [_pushStreamManager stopLoadingStream:_associatedStream];
-    STAssertEquals(_pushStreamManager.pushStreamCount, 0U, nil);
-    STAssertEquals(_pushStreamManager.associatedStreamCount, 0U, nil);
+    XCTAssertEqual(_pushStreamManager.pushStreamCount, 0U);
+    XCTAssertEqual(_pushStreamManager.associatedStreamCount, 0U);
 }
 
 - (void)testAttachToPushRequestDoesMakeAllCallbacks
@@ -141,18 +141,18 @@
     [_pushStream1.client URLProtocolDidFinishLoading:_pushStream1.client];
 
     SPDYStream *pushStream = [self attachToPushRequestWithUrl:@"http://mocked/pushed"];
-    STAssertNotNil(pushStream, nil);
-    STAssertEqualObjects(pushStream.request.URL.absoluteString, @"http://mocked/pushed", nil);
+    XCTAssertNotNil(pushStream);
+    XCTAssertEqualObjects(pushStream.request.URL.absoluteString, @"http://mocked/pushed");
 
     SPDYMockURLProtocolClient *client = pushStream.client;
-    STAssertTrue(client.calledDidReceiveResponse, nil);
-    STAssertTrue(client.calledDidLoadData, nil);
-    STAssertFalse(client.calledDidFailWithError, nil);
-    STAssertTrue(client.calledDidFinishLoading, nil);
-    STAssertNotNil(client.lastResponse, nil);
-    STAssertEquals(client.lastResponse.statusCode, 200, nil);
-    STAssertEquals(client.lastCacheStoragePolicy, NSURLCacheStorageAllowed, nil);
-    STAssertEquals(client.lastData.length, 200U, nil);
+    XCTAssertTrue(client.calledDidReceiveResponse);
+    XCTAssertTrue(client.calledDidLoadData);
+    XCTAssertFalse(client.calledDidFailWithError);
+    XCTAssertTrue(client.calledDidFinishLoading);
+    XCTAssertNotNil(client.lastResponse);
+    XCTAssertEqual(client.lastResponse.statusCode, 200);
+    XCTAssertEqual(client.lastCacheStoragePolicy, NSURLCacheStorageAllowed);
+    XCTAssertEqual(client.lastData.length, 200U);
 }
 
 - (void)testAttachToPushRequestFailsAfterStreamFails
@@ -169,7 +169,7 @@
     [_pushStream1.client URLProtocol:_pushStream1.client didFailWithError:error];
 
     SPDYStream *pushStream = [self attachToPushRequestWithUrl:@"http://mocked/pushed"];
-    STAssertNil(pushStream, nil);
+    XCTAssertNil(pushStream);
 }
 
 - (void)testAttachToPushRequestInMiddleDoesMakeAllCallbacks
@@ -183,24 +183,24 @@
     [_pushStream1.client URLProtocol:_pushStream1.client didLoadData:data];
 
     SPDYStream *pushStream = [self attachToPushRequestWithUrl:@"http://mocked/pushed"];
-    STAssertNotNil(pushStream, nil);
-    STAssertEqualObjects(pushStream.request.URL.absoluteString, @"http://mocked/pushed", nil);
+    XCTAssertNotNil(pushStream);
+    XCTAssertEqualObjects(pushStream.request.URL.absoluteString, @"http://mocked/pushed");
 
     SPDYMockURLProtocolClient *client = pushStream.client;
-    STAssertTrue(client.calledDidReceiveResponse, nil);
-    STAssertTrue(client.calledDidLoadData, nil);
-    STAssertFalse(client.calledDidFailWithError, nil);
-    STAssertFalse(client.calledDidFinishLoading, nil);
-    STAssertNotNil(client.lastResponse, nil);
-    STAssertEquals(client.lastData.length, 100U, nil);
+    XCTAssertTrue(client.calledDidReceiveResponse);
+    XCTAssertTrue(client.calledDidLoadData);
+    XCTAssertFalse(client.calledDidFailWithError);
+    XCTAssertFalse(client.calledDidFinishLoading);
+    XCTAssertNotNil(client.lastResponse);
+    XCTAssertEqual(client.lastData.length, 100U);
 
     // More data then finish
     data = [NSMutableData dataWithLength:50];
     [_pushStream1.client URLProtocol:_pushStream1.client didLoadData:data];
     [_pushStream1.client URLProtocolDidFinishLoading:_pushStream1.client];
 
-    STAssertTrue(client.calledDidFinishLoading, nil);
-    STAssertEquals(client.lastData.length, 50U, nil); // not an accumulator
+    XCTAssertTrue(client.calledDidFinishLoading);
+    XCTAssertEqual(client.lastData.length, 50U); // not an accumulator
 }
 
 @end

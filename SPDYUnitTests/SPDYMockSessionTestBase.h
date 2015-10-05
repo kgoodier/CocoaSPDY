@@ -36,7 +36,7 @@ typedef void (^SPDYAsyncTestCallback)();
 @property (nonatomic, copy) SPDYAsyncTestCallback callback;
 @end
 
-@interface SPDYMockSessionTestBase : SenTestCase
+@interface SPDYMockSessionTestBase : XCTestCase
 {
     // Note on frameEncoder:
     // Used locally for encoding frames. Whatever gets encoded manually in the frameEncoder

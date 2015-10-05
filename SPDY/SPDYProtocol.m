@@ -105,7 +105,7 @@ static dispatch_once_t initConfig;
 
 @implementation SPDYMetadata
 
-- (id)init
+- (instancetype)init
 {
     self = [super init];
     if (self) {
@@ -122,7 +122,7 @@ static dispatch_once_t initConfig;
     SPDYMetadata *_metadata;
 }
 
-- (id)initWithStream:(SPDYStream *)stream
+- (instancetype)initWithStream:(SPDYStream *)stream
 {
     self = [super init];
     if (self) {

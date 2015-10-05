@@ -10,7 +10,7 @@
 //  Modified by Kevin Goodier on 9/19/14.
 //
 
-#import <SenTestingKit/SenTestingKit.h>
+#import <XCTest/XCTest.h>
 #import "SPDYOrigin.h"
 #import "SPDYSession.h"
 #import "SPDYSocket+SPDYSocketMock.h"
@@ -53,13 +53,13 @@
 
     // If a client receives a server push stream with stream-id 0, it MUST issue a session error
     // (Section 2.4.2) with the status code PROTOCOL_ERROR.
-    STAssertEquals(_mockDecoderDelegate.frameCount, (NSUInteger)2, nil);
-    STAssertTrue([_mockDecoderDelegate.framesReceived[0] isKindOfClass:[SPDYGoAwayFrame class]], nil);
-    STAssertTrue([_mockDecoderDelegate.framesReceived[1] isKindOfClass:[SPDYRstStreamFrame class]], nil);
-    STAssertEquals(((SPDYGoAwayFrame *)_mockDecoderDelegate.framesReceived[0]).statusCode, SPDY_SESSION_PROTOCOL_ERROR, nil);
-    STAssertEquals(((SPDYGoAwayFrame *)_mockDecoderDelegate.framesReceived[0]).lastGoodStreamId, (SPDYStreamId)0, nil);
-    STAssertEquals(((SPDYRstStreamFrame *)_mockDecoderDelegate.framesReceived[1]).statusCode, SPDY_STREAM_PROTOCOL_ERROR, nil);
-    STAssertEquals(((SPDYRstStreamFrame *)_mockDecoderDelegate.framesReceived[1]).streamId, (SPDYStreamId)1, nil);
+    XCTAssertEqual(_mockDecoderDelegate.frameCount, (NSUInteger)2);
+    XCTAssertTrue([_mockDecoderDelegate.framesReceived[0] isKindOfClass:[SPDYGoAwayFrame class]]);
+    XCTAssertTrue([_mockDecoderDelegate.framesReceived[1] isKindOfClass:[SPDYRstStreamFrame class]]);
+    XCTAssertEqual(((SPDYGoAwayFrame *)_mockDecoderDelegate.framesReceived[0]).statusCode, SPDY_SESSION_PROTOCOL_ERROR);
+    XCTAssertEqual(((SPDYGoAwayFrame *)_mockDecoderDelegate.framesReceived[0]).lastGoodStreamId, (SPDYStreamId)0);
+    XCTAssertEqual(((SPDYRstStreamFrame *)_mockDecoderDelegate.framesReceived[1]).statusCode, SPDY_STREAM_PROTOCOL_ERROR);
+    XCTAssertEqual(((SPDYRstStreamFrame *)_mockDecoderDelegate.framesReceived[1]).streamId, (SPDYStreamId)1);
 }
 
 - (void)testSYNStreamWithUnidirectionalFlagUnsetRespondsWithSessionError
@@ -82,13 +82,13 @@
     [self makeSessionReadData:_testEncoderDelegate.lastEncodedData];
 
     // @@@ Confirm this is right behavior
-    STAssertEquals(_mockDecoderDelegate.frameCount, (NSUInteger)2, nil);
-    STAssertTrue([_mockDecoderDelegate.framesReceived[0] isKindOfClass:[SPDYGoAwayFrame class]], nil);
-    STAssertTrue([_mockDecoderDelegate.framesReceived[1] isKindOfClass:[SPDYRstStreamFrame class]], nil);
-    STAssertEquals(((SPDYGoAwayFrame *)_mockDecoderDelegate.framesReceived[0]).statusCode, SPDY_SESSION_PROTOCOL_ERROR, nil);
-    STAssertEquals(((SPDYGoAwayFrame *)_mockDecoderDelegate.framesReceived[0]).lastGoodStreamId, (SPDYStreamId)0, nil);
-    STAssertEquals(((SPDYRstStreamFrame *)_mockDecoderDelegate.framesReceived[1]).statusCode, SPDY_STREAM_PROTOCOL_ERROR, nil);
-    STAssertEquals(((SPDYRstStreamFrame *)_mockDecoderDelegate.framesReceived[1]).streamId, (SPDYStreamId)1, nil);
+    XCTAssertEqual(_mockDecoderDelegate.frameCount, (NSUInteger)2);
+    XCTAssertTrue([_mockDecoderDelegate.framesReceived[0] isKindOfClass:[SPDYGoAwayFrame class]]);
+    XCTAssertTrue([_mockDecoderDelegate.framesReceived[1] isKindOfClass:[SPDYRstStreamFrame class]]);
+    XCTAssertEqual(((SPDYGoAwayFrame *)_mockDecoderDelegate.framesReceived[0]).statusCode, SPDY_SESSION_PROTOCOL_ERROR);
+    XCTAssertEqual(((SPDYGoAwayFrame *)_mockDecoderDelegate.framesReceived[0]).lastGoodStreamId, (SPDYStreamId)0);
+    XCTAssertEqual(((SPDYRstStreamFrame *)_mockDecoderDelegate.framesReceived[1]).statusCode, SPDY_STREAM_PROTOCOL_ERROR);
+    XCTAssertEqual(((SPDYRstStreamFrame *)_mockDecoderDelegate.framesReceived[1]).streamId, (SPDYStreamId)1);
 }
 
 - (void)testSYNStreamWithAssociatedStreamIdZeroRespondsWithSessionError
@@ -105,17 +105,17 @@
             @":status":@"200", @":version":@"http/1.1", @"PushHeader":@"PushValue"};
     synStreamFrame.associatedToStreamId = 0;
     [_testEncoderDelegate clear];
-    STAssertTrue([_testEncoder encodeSynStreamFrame:synStreamFrame error:nil] > 0, nil);
+    XCTAssertTrue([_testEncoder encodeSynStreamFrame:synStreamFrame error:nil] > 0);
     [self makeSessionReadData:_testEncoderDelegate.lastEncodedData];
 
     // @@@ Confirm this is right behavior
-    STAssertEquals(_mockDecoderDelegate.frameCount, (NSUInteger)2, nil);
-    STAssertTrue([_mockDecoderDelegate.framesReceived[0] isKindOfClass:[SPDYGoAwayFrame class]], nil);
-    STAssertTrue([_mockDecoderDelegate.framesReceived[1] isKindOfClass:[SPDYRstStreamFrame class]], nil);
-    STAssertEquals(((SPDYGoAwayFrame *)_mockDecoderDelegate.framesReceived[0]).statusCode, SPDY_SESSION_PROTOCOL_ERROR, nil);
-    STAssertEquals(((SPDYGoAwayFrame *)_mockDecoderDelegate.framesReceived[0]).lastGoodStreamId, (SPDYStreamId)0, nil);
-    STAssertEquals(((SPDYRstStreamFrame *)_mockDecoderDelegate.framesReceived[1]).statusCode, SPDY_STREAM_PROTOCOL_ERROR, nil);
-    STAssertEquals(((SPDYRstStreamFrame *)_mockDecoderDelegate.framesReceived[1]).streamId, (SPDYStreamId)1, nil);
+    XCTAssertEqual(_mockDecoderDelegate.frameCount, (NSUInteger)2);
+    XCTAssertTrue([_mockDecoderDelegate.framesReceived[0] isKindOfClass:[SPDYGoAwayFrame class]]);
+    XCTAssertTrue([_mockDecoderDelegate.framesReceived[1] isKindOfClass:[SPDYRstStreamFrame class]]);
+    XCTAssertEqual(((SPDYGoAwayFrame *)_mockDecoderDelegate.framesReceived[0]).statusCode, SPDY_SESSION_PROTOCOL_ERROR);
+    XCTAssertEqual(((SPDYGoAwayFrame *)_mockDecoderDelegate.framesReceived[0]).lastGoodStreamId, (SPDYStreamId)0);
+    XCTAssertEqual(((SPDYRstStreamFrame *)_mockDecoderDelegate.framesReceived[1]).statusCode, SPDY_STREAM_PROTOCOL_ERROR);
+    XCTAssertEqual(((SPDYRstStreamFrame *)_mockDecoderDelegate.framesReceived[1]).streamId, (SPDYStreamId)1);
 }
 
 - (void)testSYNStreamWithNoSchemeHeaderRespondsWithReset
@@ -129,10 +129,10 @@
      // When a client receives a SYN_STREAM from the server without a the ':host', ':scheme', and
      // ':path' headers in the Name/Value section, it MUST reply with a RST_STREAM with error
      // code HTTP_PROTOCOL_ERROR.
-     STAssertEquals(_mockDecoderDelegate.frameCount, (NSUInteger)1, nil);
-     STAssertTrue([_mockDecoderDelegate.lastFrame isKindOfClass:[SPDYRstStreamFrame class]], nil);
-     STAssertEquals(((SPDYRstStreamFrame *)_mockDecoderDelegate.lastFrame).statusCode, SPDY_STREAM_PROTOCOL_ERROR, nil);
-     STAssertEquals(((SPDYRstStreamFrame *)_mockDecoderDelegate.lastFrame).streamId, (SPDYStreamId)2, nil);
+     XCTAssertEqual(_mockDecoderDelegate.frameCount, (NSUInteger)1);
+     XCTAssertTrue([_mockDecoderDelegate.lastFrame isKindOfClass:[SPDYRstStreamFrame class]]);
+     XCTAssertEqual(((SPDYRstStreamFrame *)_mockDecoderDelegate.lastFrame).statusCode, SPDY_STREAM_PROTOCOL_ERROR);
+     XCTAssertEqual(((SPDYRstStreamFrame *)_mockDecoderDelegate.lastFrame).streamId, (SPDYStreamId)2);
  }
 
 - (void)testSYNStreamAndAHeadersFrameWithDuplicatesRespondsWithReset
@@ -149,10 +149,10 @@
     // If the server sends a HEADER frame containing duplicate headers with a previous HEADERS
     // frame for the same stream, the client must issue a stream error (Section 2.4.2) with error
     // code PROTOCOL ERROR.
-    STAssertEquals(_mockDecoderDelegate.frameCount, (NSUInteger)1, nil);
-    STAssertTrue([_mockDecoderDelegate.lastFrame isKindOfClass:[SPDYRstStreamFrame class]], nil);
-    STAssertEquals(((SPDYRstStreamFrame *)_mockDecoderDelegate.lastFrame).statusCode, SPDY_STREAM_PROTOCOL_ERROR, nil);
-    STAssertEquals(((SPDYRstStreamFrame *)_mockDecoderDelegate.lastFrame).streamId, (SPDYStreamId)2, nil);
+    XCTAssertEqual(_mockDecoderDelegate.frameCount, (NSUInteger)1);
+    XCTAssertTrue([_mockDecoderDelegate.lastFrame isKindOfClass:[SPDYRstStreamFrame class]]);
+    XCTAssertEqual(((SPDYRstStreamFrame *)_mockDecoderDelegate.lastFrame).statusCode, SPDY_STREAM_PROTOCOL_ERROR);
+    XCTAssertEqual(((SPDYRstStreamFrame *)_mockDecoderDelegate.lastFrame).streamId, (SPDYStreamId)2);
 }
 
 #pragma mark Simple push callback tests
@@ -167,15 +167,15 @@
     [self mockServerHeadersFrameForPushWithId:2 last:NO];
 
     SPDYMockURLProtocolClient *pushClient = [self attachToPushRequestWithUrl:@"http://mocked/pushed"].client;
-    STAssertTrue(pushClient.calledDidReceiveResponse, nil);
-    STAssertFalse(pushClient.calledDidLoadData, nil);
-    STAssertFalse(pushClient.calledDidFailWithError, nil);
-    STAssertFalse(pushClient.calledDidFinishLoading, nil);
+    XCTAssertTrue(pushClient.calledDidReceiveResponse);
+    XCTAssertFalse(pushClient.calledDidLoadData);
+    XCTAssertFalse(pushClient.calledDidFailWithError);
+    XCTAssertFalse(pushClient.calledDidFinishLoading);
 
     NSHTTPURLResponse *pushResponse = pushClient.lastResponse;
-    STAssertEqualObjects(pushResponse.URL.absoluteString, @"http://mocked/pushed", nil);
-    STAssertEquals(pushResponse.statusCode, 200, nil);
-    STAssertEqualObjects([pushResponse.allHeaderFields valueForKey:@"PushHeader"], @"PushValue", nil);
+    XCTAssertEqualObjects(pushResponse.URL.absoluteString, @"http://mocked/pushed");
+    XCTAssertEqual(pushResponse.statusCode, 200);
+    XCTAssertEqualObjects([pushResponse.allHeaderFields valueForKey:@"PushHeader"], @"PushValue");
 }
 
 - (void)testSYNStreamWithStreamIDNonZeroPostsNotification
@@ -183,11 +183,11 @@
     SPDYMockURLProtocolClient __block *pushClient = nil;
 
     [[NSNotificationCenter defaultCenter] addObserverForName:SPDYPushRequestReceivedNotification object:nil queue:nil usingBlock:^(NSNotification *note) {
-        STAssertTrue([note.userInfo[@"request"] isKindOfClass:[NSURLRequest class]], nil);
+        XCTAssertTrue([note.userInfo[@"request"] isKindOfClass:[NSURLRequest class]]);
 
         NSURLRequest *request = note.userInfo[@"request"];
-        STAssertNotNil(request, nil);
-        STAssertEqualObjects(request.URL.absoluteString, @"http://mocked/pushed", nil);
+        XCTAssertNotNil(request);
+        XCTAssertEqualObjects(request.URL.absoluteString, @"http://mocked/pushed");
 
         pushClient = [self attachToPushRequest:request].client;
     }];
@@ -197,20 +197,20 @@
 
     // Send SYN_STREAM from server to client. Notification posted at this point.
     [self mockServerSynStreamWithId:2 last:NO];
-    STAssertNotNil(pushClient, nil);
-    STAssertFalse(pushClient.calledDidReceiveResponse, nil);
+    XCTAssertNotNil(pushClient);
+    XCTAssertFalse(pushClient.calledDidReceiveResponse);
 
     // Send HEADERS from server to client
     [self mockServerHeadersFrameForPushWithId:2 last:NO];
-    STAssertTrue(pushClient.calledDidReceiveResponse, nil);
-    STAssertFalse(pushClient.calledDidLoadData, nil);
-    STAssertFalse(pushClient.calledDidFailWithError, nil);
-    STAssertFalse(pushClient.calledDidFinishLoading, nil);
+    XCTAssertTrue(pushClient.calledDidReceiveResponse);
+    XCTAssertFalse(pushClient.calledDidLoadData);
+    XCTAssertFalse(pushClient.calledDidFailWithError);
+    XCTAssertFalse(pushClient.calledDidFinishLoading);
     
     NSHTTPURLResponse *pushResponse = pushClient.lastResponse;
-    STAssertEqualObjects(pushResponse.URL.absoluteString, @"http://mocked/pushed", nil);
-    STAssertEquals(pushResponse.statusCode, 200, nil);
-    STAssertEqualObjects([pushResponse.allHeaderFields valueForKey:@"PushHeader"], @"PushValue", nil);
+    XCTAssertEqualObjects(pushResponse.URL.absoluteString, @"http://mocked/pushed");
+    XCTAssertEqual(pushResponse.statusCode, 200);
+    XCTAssertEqualObjects([pushResponse.allHeaderFields valueForKey:@"PushHeader"], @"PushValue");
 
 }
 
@@ -225,8 +225,8 @@
     // Send SYN_STREAM from server to client
     [self mockServerSynStreamWithId:2 last:NO];
 
-    STAssertEquals(_mockDecoderDelegate.frameCount, (NSUInteger)1, nil);
-    STAssertTrue([_mockDecoderDelegate.lastFrame isKindOfClass:[SPDYGoAwayFrame class]], nil);
+    XCTAssertEqual(_mockDecoderDelegate.frameCount, (NSUInteger)1);
+    XCTAssertTrue([_mockDecoderDelegate.lastFrame isKindOfClass:[SPDYGoAwayFrame class]]);
 }
 
 - (void)testSYNStreamsAndAssociatedStreamClosingDidCompleteWithMetadata
@@ -242,27 +242,27 @@
     [self mockServerHeadersFrameForPushWithId:4 last:YES];
     SPDYMockURLProtocolClient *pushClient4 = [self attachToPushRequestWithUrl:@"http://mocked/pushed4"].client;
 
-    STAssertEquals(_mockDecoderDelegate.frameCount, (NSUInteger)0, nil);
-    STAssertTrue(_mockURLProtocolClient.calledDidReceiveResponse, nil);
-    STAssertFalse(_mockURLProtocolClient.calledDidFinishLoading, nil);
-    STAssertTrue(pushClient2.calledDidReceiveResponse, nil);
-    STAssertFalse(pushClient2.calledDidFinishLoading, nil);
-    STAssertTrue(pushClient4.calledDidReceiveResponse, nil);
-    STAssertTrue(pushClient4.calledDidFinishLoading, nil);
+    XCTAssertEqual(_mockDecoderDelegate.frameCount, (NSUInteger)0);
+    XCTAssertTrue(_mockURLProtocolClient.calledDidReceiveResponse);
+    XCTAssertFalse(_mockURLProtocolClient.calledDidFinishLoading);
+    XCTAssertTrue(pushClient2.calledDidReceiveResponse);
+    XCTAssertFalse(pushClient2.calledDidFinishLoading);
+    XCTAssertTrue(pushClient4.calledDidReceiveResponse);
+    XCTAssertTrue(pushClient4.calledDidFinishLoading);
 
     SPDYMetadata *metadata = [SPDYProtocol metadataForResponse:pushClient4.lastResponse];
-    STAssertNotNil(metadata, nil);
+    XCTAssertNotNil(metadata);
 
     // Close original
     [self mockServerDataFrameWithId:1 length:1 last:YES];
-    STAssertEquals(_mockDecoderDelegate.frameCount, (NSUInteger)0, nil);
-    STAssertTrue(_mockURLProtocolClient.calledDidFinishLoading, nil);
-    STAssertFalse(pushClient2.calledDidFinishLoading, nil);
+    XCTAssertEqual(_mockDecoderDelegate.frameCount, (NSUInteger)0);
+    XCTAssertTrue(_mockURLProtocolClient.calledDidFinishLoading);
+    XCTAssertFalse(pushClient2.calledDidFinishLoading);
 
     // Close push 1
     [self mockServerDataFrameWithId:2 length:2 last:YES];
-    STAssertEquals(_mockDecoderDelegate.frameCount, (NSUInteger)0, nil);
-    STAssertTrue(pushClient2.calledDidFinishLoading, nil);
+    XCTAssertEqual(_mockDecoderDelegate.frameCount, (NSUInteger)0);
+    XCTAssertTrue(pushClient2.calledDidFinishLoading);
 }
 
 #if 0
@@ -277,14 +277,14 @@
     // Send SYN_STREAM from server to client with 'last' bit set.
     [self mockServerSynStreamWithId:2 last:YES];
     [self mockServerHeadersFrameForPushWithId:2 last:NO];
-    STAssertTrue([self waitForAnyCallbackOrFrame], nil);  // for extended delegate
-    STAssertNotNil(_mockExtendedDelegate.lastPushResponse, nil);
+    XCTAssertTrue([self waitForAnyCallbackOrFrame], nil);  // for extended delegate
+    XCTAssertNotNil(_mockExtendedDelegate.lastPushResponse);
 
     // Got the completion block callback indicating push response is done?
-    STAssertTrue([self waitForAnyCallbackOrFrame], nil);
-    STAssertNotNil(_mockPushResponseDataDelegate.lastCompletionPushResponse, nil);
-    STAssertEquals(_mockPushResponseDataDelegate.lastCompletionData.length, (NSUInteger)0, nil);
-    STAssertNil(_mockPushResponseDataDelegate.lastCompletionError, nil);
+    XCTAssertTrue([self waitForAnyCallbackOrFrame]);
+    XCTAssertNotNil(_mockPushResponseDataDelegate.lastCompletionPushResponse);
+    XCTAssertEqual(_mockPushResponseDataDelegate.lastCompletionData.length, (NSUInteger)0);
+    XCTAssertNil(_mockPushResponseDataDelegate.lastCompletionError);
 }
 
 - (void)testSYNStreamClosesAfterDataWithDelayedExtendedCallbackMakesCompletionBlockCallback
@@ -297,13 +297,13 @@
     [self mockServerSynStreamWithId:2 last:NO];
     [self mockServerHeadersFrameForPushWithId:2 last:NO];
     [self mockServerDataFrameWithId:2 length:1 last:YES];
-    STAssertTrue([self waitForAnyCallbackOrFrame], nil);
-    STAssertTrue([self waitForAnyCallbackOrFrame], nil);
+    XCTAssertTrue([self waitForAnyCallbackOrFrame]);
+    XCTAssertTrue([self waitForAnyCallbackOrFrame]);
 
-    STAssertNotNil(_mockExtendedDelegate.lastPushResponse, nil);
-    STAssertNotNil(_mockPushResponseDataDelegate.lastCompletionPushResponse, nil);
-    STAssertEquals(_mockPushResponseDataDelegate.lastCompletionData.length, (NSUInteger)1, nil);
-    STAssertNil(_mockPushResponseDataDelegate.lastCompletionError, nil);
+    XCTAssertNotNil(_mockExtendedDelegate.lastPushResponse);
+    XCTAssertNotNil(_mockPushResponseDataDelegate.lastCompletionPushResponse);
+    XCTAssertEqual(_mockPushResponseDataDelegate.lastCompletionData.length, (NSUInteger)1);
+    XCTAssertNil(_mockPushResponseDataDelegate.lastCompletionError);
 }
 
 - (void)testSYNStreamWithDataMakesCompletionBlockCallback
@@ -316,22 +316,22 @@
     [self mockSynStreamAndReply];
     [self mockServerSynStreamWithId:2 last:NO];
     [self mockServerHeadersFrameForPushWithId:2 last:NO];
-    STAssertTrue([self waitForAnyCallbackOrFrame], nil);
-    STAssertNotNil(_mockExtendedDelegate.lastPushResponse, nil);
+    XCTAssertTrue([self waitForAnyCallbackOrFrame]);
+    XCTAssertNotNil(_mockExtendedDelegate.lastPushResponse);
 
     // Send DATA frame, verify callback made
     [self mockServerDataFrameWithId:2 length:100 last:YES];
-    STAssertTrue([self waitForAnyCallbackOrFrame], nil);
-    STAssertEquals(_mockDecoderDelegate.frameCount, (NSUInteger)0, nil);  // no errors
-    STAssertNotNil(_mockPushResponseDataDelegate.lastCompletionPushResponse, nil);
-    STAssertNotNil(_mockPushResponseDataDelegate.lastCompletionPushRequest, nil);
-    STAssertNotNil(_mockPushResponseDataDelegate.lastCompletionData, nil);
-    STAssertEquals(_mockPushResponseDataDelegate.lastCompletionData.length, (NSUInteger)100, nil);
-    STAssertNil(_mockPushResponseDataDelegate.lastCompletionError, nil);
+    XCTAssertTrue([self waitForAnyCallbackOrFrame]);
+    XCTAssertEqual(_mockDecoderDelegate.frameCount, (NSUInteger)0, nil);  // no errors
+    XCTAssertNotNil(_mockPushResponseDataDelegate.lastCompletionPushResponse);
+    XCTAssertNotNil(_mockPushResponseDataDelegate.lastCompletionPushRequest);
+    XCTAssertNotNil(_mockPushResponseDataDelegate.lastCompletionData);
+    XCTAssertEqual(_mockPushResponseDataDelegate.lastCompletionData.length, (NSUInteger)100);
+    XCTAssertNil(_mockPushResponseDataDelegate.lastCompletionError);
 
     // Some sanity checks
-    STAssertEqualObjects(_mockExtendedDelegate.lastPushResponse, _mockPushResponseDataDelegate.lastCompletionPushResponse, nil);
-    STAssertEqualObjects(_mockExtendedDelegate.lastPushRequest, _mockPushResponseDataDelegate.lastCompletionPushRequest, nil);
+    XCTAssertEqualObjects(_mockExtendedDelegate.lastPushResponse, _mockPushResponseDataDelegate.lastCompletionPushResponse);
+    XCTAssertEqualObjects(_mockExtendedDelegate.lastPushRequest, _mockPushResponseDataDelegate.lastCompletionPushRequest);
 }
 
  - (void)testSYNStreamWithChunkedDataMakesCompletionBlockCallback
@@ -340,11 +340,11 @@
      _mockExtendedDelegate.testSetsPushResponseDataDelegate = nil;
      [self mockPushResponseWithTwoDataFrames];
 
-     STAssertNotNil(_mockPushResponseDataDelegate.lastCompletionPushResponse, nil);
-     STAssertNotNil(_mockPushResponseDataDelegate.lastCompletionPushRequest, nil);
-     STAssertNotNil(_mockPushResponseDataDelegate.lastCompletionData, nil);
-     STAssertEquals(_mockPushResponseDataDelegate.lastCompletionData.length, (NSUInteger)201, nil);
-     STAssertNil(_mockPushResponseDataDelegate.lastCompletionError, nil);
+     XCTAssertNotNil(_mockPushResponseDataDelegate.lastCompletionPushResponse);
+     XCTAssertNotNil(_mockPushResponseDataDelegate.lastCompletionPushRequest);
+     XCTAssertNotNil(_mockPushResponseDataDelegate.lastCompletionData);
+     XCTAssertEqual(_mockPushResponseDataDelegate.lastCompletionData.length, (NSUInteger)201);
+     XCTAssertNil(_mockPushResponseDataDelegate.lastCompletionError);
 }
 
 - (void)testSYNStreamClosedRespondsWithResetAndMakesCompletionBlockCallback
@@ -353,22 +353,22 @@
     [self mockSynStreamAndReply];
     [self mockServerSynStreamWithId:2 last:NO];
     [self mockServerHeadersFrameForPushWithId:2 last:NO];
-    STAssertTrue([self waitForAnyCallbackOrFrame], nil);
-    STAssertEquals(_mockDecoderDelegate.frameCount, (NSUInteger)0, nil);  // no errors
+    XCTAssertTrue([self waitForAnyCallbackOrFrame]);
+    XCTAssertEqual(_mockDecoderDelegate.frameCount, (NSUInteger)0, nil);  // no errors
 
     // Cancel it
     // @@@ Uh, how to do this?
-    STAssertTrue([self waitForAnyCallbackOrFrame], nil);
+    XCTAssertTrue([self waitForAnyCallbackOrFrame]);
 
-    STAssertEquals(_mockDecoderDelegate.frameCount, (NSUInteger)1, nil);
-    STAssertTrue([_mockDecoderDelegate.lastFrame isKindOfClass:[SPDYRstStreamFrame class]], nil);
-    STAssertEquals(((SPDYRstStreamFrame *)_mockDecoderDelegate.lastFrame).statusCode, SPDY_STREAM_CANCEL, nil);
-    STAssertEquals(((SPDYRstStreamFrame *)_mockDecoderDelegate.lastFrame).streamId, (SPDYStreamId)2, nil);
+    XCTAssertEqual(_mockDecoderDelegate.frameCount, (NSUInteger)1);
+    XCTAssertTrue([_mockDecoderDelegate.lastFrame isKindOfClass:[SPDYRstStreamFrame class]]);
+    XCTAssertEqual(((SPDYRstStreamFrame *)_mockDecoderDelegate.lastFrame).statusCode, SPDY_STREAM_CANCEL);
+    XCTAssertEqual(((SPDYRstStreamFrame *)_mockDecoderDelegate.lastFrame).streamId, (SPDYStreamId)2);
 
-    STAssertNotNil(_mockPushResponseDataDelegate.lastCompletionPushResponse, nil);
-    STAssertNotNil(_mockPushResponseDataDelegate.lastCompletionPushRequest, nil);
-    STAssertNil(_mockPushResponseDataDelegate.lastCompletionData, nil);
-    STAssertNotNil(_mockPushResponseDataDelegate.lastCompletionError, nil);
+    XCTAssertNotNil(_mockPushResponseDataDelegate.lastCompletionPushResponse);
+    XCTAssertNotNil(_mockPushResponseDataDelegate.lastCompletionPushRequest);
+    XCTAssertNil(_mockPushResponseDataDelegate.lastCompletionData);
+    XCTAssertNotNil(_mockPushResponseDataDelegate.lastCompletionError);
 }
 
 - (void)testSYNStreamWithChunkedDataMakesDataDelegateCallbacks
@@ -380,41 +380,41 @@
     [self mockSynStreamAndReply];
     [self mockServerSynStreamWithId:2 last:NO];
     [self mockServerHeadersFrameForPushWithId:2 last:NO];
-    STAssertTrue([self waitForAnyCallbackOrFrame], nil);
-    STAssertEquals(_mockDecoderDelegate.frameCount, (NSUInteger)0, nil);  // no errors
-    STAssertNotNil(_mockExtendedDelegate.lastPushResponse, nil);
+    XCTAssertTrue([self waitForAnyCallbackOrFrame]);
+    XCTAssertEqual(_mockDecoderDelegate.frameCount, (NSUInteger)0, nil);  // no errors
+    XCTAssertNotNil(_mockExtendedDelegate.lastPushResponse);
 
     // Send DATA frame, verify callback made
     [self mockServerDataFrameWithId:2 length:100 last:NO];
-    STAssertTrue([self waitForAnyCallbackOrFrame], nil);
-    STAssertEquals(_mockDecoderDelegate.frameCount, (NSUInteger)0, nil);  // no errors
-    STAssertNotNil(_mockPushResponseDataDelegate.lastRequest, nil);
-    STAssertNotNil(_mockPushResponseDataDelegate.lastData, nil);
-    STAssertEquals(_mockPushResponseDataDelegate.lastData.length, (NSUInteger)100, nil);
+    XCTAssertTrue([self waitForAnyCallbackOrFrame]);
+    XCTAssertEqual(_mockDecoderDelegate.frameCount, (NSUInteger)0, nil);  // no errors
+    XCTAssertNotNil(_mockPushResponseDataDelegate.lastRequest);
+    XCTAssertNotNil(_mockPushResponseDataDelegate.lastData);
+    XCTAssertEqual(_mockPushResponseDataDelegate.lastData.length, (NSUInteger)100);
 
     // Send last DATA frame
     [self mockServerDataFrameWithId:2 length:101 last:YES];
-    STAssertTrue([self waitForAnyCallbackOrFrame], nil);
-    STAssertEquals(_mockDecoderDelegate.frameCount, (NSUInteger)0, nil);  // no errors
-    STAssertNotNil(_mockPushResponseDataDelegate.lastRequest, nil);
-    STAssertNotNil(_mockPushResponseDataDelegate.lastData, nil);
-    STAssertEquals(_mockPushResponseDataDelegate.lastData.length, (NSUInteger)101, nil);
+    XCTAssertTrue([self waitForAnyCallbackOrFrame]);
+    XCTAssertEqual(_mockDecoderDelegate.frameCount, (NSUInteger)0, nil);  // no errors
+    XCTAssertNotNil(_mockPushResponseDataDelegate.lastRequest);
+    XCTAssertNotNil(_mockPushResponseDataDelegate.lastData);
+    XCTAssertEqual(_mockPushResponseDataDelegate.lastData.length, (NSUInteger)101);
 
     // Runloop may have scheduled the final didComplete callback before we could stop it. But
     // if not, wait for it.
     if (_mockPushResponseDataDelegate.lastMetadata == nil) {
-        STAssertTrue([self waitForAnyCallbackOrFrame], nil);
+        XCTAssertTrue([self waitForAnyCallbackOrFrame]);
     }
-    STAssertEquals(_mockDecoderDelegate.frameCount, (NSUInteger)0, nil);  // no errors
-    STAssertNotNil(_mockPushResponseDataDelegate.lastMetadata, nil);
-    STAssertEqualObjects(_mockPushResponseDataDelegate.lastMetadata[SPDYMetadataVersionKey], @"3.1", nil);
-    STAssertEqualObjects(_mockPushResponseDataDelegate.lastMetadata[SPDYMetadataStreamIdKey], @"2", nil);
-    STAssertTrue([_mockPushResponseDataDelegate.lastMetadata[SPDYMetadataStreamRxBytesKey] integerValue] > 0, nil);
-    STAssertTrue([_mockPushResponseDataDelegate.lastMetadata[SPDYMetadataStreamTxBytesKey] integerValue] == 0, nil);
+    XCTAssertEqual(_mockDecoderDelegate.frameCount, (NSUInteger)0, nil);  // no errors
+    XCTAssertNotNil(_mockPushResponseDataDelegate.lastMetadata);
+    XCTAssertEqualObjects(_mockPushResponseDataDelegate.lastMetadata[SPDYMetadataVersionKey], @"3.1");
+    XCTAssertEqualObjects(_mockPushResponseDataDelegate.lastMetadata[SPDYMetadataStreamIdKey], @"2");
+    XCTAssertTrue([_mockPushResponseDataDelegate.lastMetadata[SPDYMetadataStreamRxBytesKey] integerValue] > 0);
+    XCTAssertTrue([_mockPushResponseDataDelegate.lastMetadata[SPDYMetadataStreamTxBytesKey] integerValue] == 0);
 
     // Some sanity checks
-    STAssertEqualObjects(_mockExtendedDelegate.lastPushRequest, _mockPushResponseDataDelegate.lastRequest, nil);
-    STAssertNil(_mockPushResponseDataDelegate.lastError, nil);
+    XCTAssertEqualObjects(_mockExtendedDelegate.lastPushRequest, _mockPushResponseDataDelegate.lastRequest);
+    XCTAssertNil(_mockPushResponseDataDelegate.lastError);
 }
 
 - (void)testSYNStreamWithChunkedDataMakesDataDelegateAndCompletionBlockCallbacks
@@ -426,14 +426,14 @@
     [self mockPushResponseWithTwoDataFrames];
 
     // Verify last chunk received
-    STAssertEquals(_mockPushResponseDataDelegate.lastData.length, (NSUInteger)101, nil);
+    XCTAssertEqual(_mockPushResponseDataDelegate.lastData.length, (NSUInteger)101);
 
     // Ensure both happened
-    STAssertNotNil(_mockPushResponseDataDelegate.lastCompletionPushResponse, nil);
-    STAssertNil(_mockPushResponseDataDelegate.lastCompletionError, nil);
-    STAssertEquals(_mockPushResponseDataDelegate.lastCompletionData.length, (NSUInteger)201, nil);
-    STAssertNil(_mockPushResponseDataDelegate.lastError, nil);
-    STAssertNotNil(_mockPushResponseDataDelegate.lastMetadata, nil);
+    XCTAssertNotNil(_mockPushResponseDataDelegate.lastCompletionPushResponse);
+    XCTAssertNil(_mockPushResponseDataDelegate.lastCompletionError);
+    XCTAssertEqual(_mockPushResponseDataDelegate.lastCompletionData.length, (NSUInteger)201);
+    XCTAssertNil(_mockPushResponseDataDelegate.lastError);
+    XCTAssertNotNil(_mockPushResponseDataDelegate.lastMetadata);
 }
 
 - (void)testSYNStreamWithChunkedDataAndCustomCacheCachesResponse
@@ -448,18 +448,18 @@
 
     // Sanity check
     NSCachedURLResponse *response = [_mockExtendedDelegate.testSetsPushResponseCache cachedResponseForRequest:request];
-    STAssertNil(response, nil);
+    XCTAssertNil(response);
 
     [self mockPushResponseWithTwoDataFrames];
 
     // Ensure neither callback happened
-    STAssertNil(_mockPushResponseDataDelegate.lastCompletionPushResponse, nil);
-    STAssertNil(_mockPushResponseDataDelegate.lastMetadata, nil);
+    XCTAssertNil(_mockPushResponseDataDelegate.lastCompletionPushResponse);
+    XCTAssertNil(_mockPushResponseDataDelegate.lastMetadata);
 
     response = [_mockExtendedDelegate.testSetsPushResponseCache cachedResponseForRequest:request];
-    STAssertNotNil(response, nil);
-    STAssertEquals(response.data.length, (NSUInteger)201, nil);
-    STAssertEqualObjects(((NSHTTPURLResponse *)response.response).allHeaderFields[@"PushHeader"], @"PushValue", nil);
+    XCTAssertNotNil(response);
+    XCTAssertEqual(response.data.length, (NSUInteger)201);
+    XCTAssertEqualObjects(((NSHTTPURLResponse *)response.response).allHeaderFields[@"PushHeader"], @"PushValue");
 }
 
 - (void)testSYNStreamWithChunkedDataAndDelegateSetsNilCacheDoesNotCacheResponse
@@ -472,12 +472,12 @@
     // Sanity check
     NSURLRequest *request = [NSURLRequest requestWithURL:[NSURL URLWithString:@"http://mocked/pushed"]];
     NSCachedURLResponse *response = [[NSURLCache sharedURLCache] cachedResponseForRequest:request];
-    STAssertNil(response, nil);
+    XCTAssertNil(response);
 
     [self mockPushResponseWithTwoDataFrames];
 
     response = [[NSURLCache sharedURLCache] cachedResponseForRequest:request];
-    STAssertNil(response, nil);
+    XCTAssertNil(response);
 }
 
 - (void)testSYNStreamWithChunkedDataAndDefaultCacheAndNoDelegateCachesResponse
@@ -489,7 +489,7 @@
     // Sanity check
     NSURLRequest *request = [NSURLRequest requestWithURL:[NSURL URLWithString:@"http://mocked/pushed"]];
     NSCachedURLResponse *response = [[NSURLCache sharedURLCache] cachedResponseForRequest:request];
-    STAssertNil(response, nil);
+    XCTAssertNil(response);
 
     // No callbacks to wait for
     [self mockSynStreamAndReply];
@@ -499,9 +499,9 @@
     [self mockServerDataFrameWithId:2 length:101 last:YES];
 
     response = [[NSURLCache sharedURLCache] cachedResponseForRequest:request];
-    STAssertNotNil(response, nil);
-    STAssertEquals(response.data.length, (NSUInteger)201, nil);
-    STAssertEqualObjects(((NSHTTPURLResponse *)response.response).allHeaderFields[@"PushHeader"], @"PushValue", nil);
+    XCTAssertNotNil(response);
+    XCTAssertEqual(response.data.length, (NSUInteger)201);
+    XCTAssertEqualObjects(((NSHTTPURLResponse *)response.response).allHeaderFields[@"PushHeader"], @"PushValue");
 }
 
 #endif
@@ -515,9 +515,9 @@
     [self mockServerHeadersFrameForPushWithId:2 last:NO];
     SPDYMockURLProtocolClient *pushClient = [self attachToPushRequestWithUrl:@"http://mocked/pushed"].client;
 
-    STAssertTrue(pushClient.calledDidReceiveResponse, nil);
-    STAssertEqualObjects([pushClient.lastResponse.allHeaderFields valueForKey:@"PushHeader"], @"PushValue", nil);
-    STAssertEqualObjects([pushClient.lastResponse.allHeaderFields valueForKey:@"PushHeader2"], nil, nil);
+    XCTAssertTrue(pushClient.calledDidReceiveResponse);
+    XCTAssertEqualObjects([pushClient.lastResponse.allHeaderFields valueForKey:@"PushHeader"], @"PushValue");
+    XCTAssertEqualObjects([pushClient.lastResponse.allHeaderFields valueForKey:@"PushHeader2"], nil);
 
     // Send HEADERS frame
     NSDictionary *headers = @{@"PushHeader2":@"PushValue2"};
@@ -533,18 +533,18 @@
     [self mockServerSynStreamWithId:2 last:NO];
     [self mockServerHeadersFrameForPushWithId:2 last:NO];
     SPDYMockURLProtocolClient *pushClient = [self attachToPushRequestWithUrl:@"http://mocked/pushed"].client;
-    STAssertTrue(pushClient.calledDidReceiveResponse, nil);
+    XCTAssertTrue(pushClient.calledDidReceiveResponse);
 
     // Send DATA frame
     [self mockServerDataFrameWithId:2 length:100 last:NO];
-    STAssertTrue(pushClient.calledDidLoadData, nil);
+    XCTAssertTrue(pushClient.calledDidLoadData);
 
     // Send last HEADERS frame
     NSDictionary *headers = @{@"PushHeader2":@"PushValue2"};
     [self mockServerHeadersFrameWithId:2 headers:headers last:YES];
 
     // Ensure stream was closed and callback made
-    STAssertTrue(pushClient.calledDidFinishLoading, nil);
+    XCTAssertTrue(pushClient.calledDidFinishLoading);
 
     // TODO: no way to expose new headers to URLProtocolClient, can't verify absence of new header.
 }
@@ -563,10 +563,10 @@
 
     [self mockPushResponseWithTwoDataFrames];
 
-    STAssertNotNil(_mockPushResponseDataDelegate.lastWillCacheSuggestedResponse, nil);
+    XCTAssertNotNil(_mockPushResponseDataDelegate.lastWillCacheSuggestedResponse);
 
     NSCachedURLResponse *response = [_mockExtendedDelegate.testSetsPushResponseCache cachedResponseForRequest:request];
-    STAssertNil(response, nil);
+    XCTAssertNil(response);
 }
 
 - (void)testSYNStreamWithChunkedDataDoesCacheSuggestedResponse
@@ -578,13 +578,13 @@
 
     [self mockPushResponseWithTwoDataFrames];
 
-    STAssertNotNil(_mockPushResponseDataDelegate.lastWillCacheSuggestedResponse, nil);
-    STAssertEqualObjects(_mockExtendedDelegate.lastPushResponse, _mockPushResponseDataDelegate.lastWillCacheSuggestedResponse.response, nil);
+    XCTAssertNotNil(_mockPushResponseDataDelegate.lastWillCacheSuggestedResponse);
+    XCTAssertEqualObjects(_mockExtendedDelegate.lastPushResponse, _mockPushResponseDataDelegate.lastWillCacheSuggestedResponse.response);
 
     NSCachedURLResponse *response = [_mockExtendedDelegate.testSetsPushResponseCache cachedResponseForRequest:request];
-    STAssertNotNil(response, nil);
-    STAssertEquals(response.data.length, (NSUInteger)201, nil);
-    STAssertEqualObjects(((NSHTTPURLResponse *)response.response).allHeaderFields[@"PushHeader"], @"PushValue", nil);
+    XCTAssertNotNil(response);
+    XCTAssertEqual(response.data.length, (NSUInteger)201);
+    XCTAssertEqualObjects(((NSHTTPURLResponse *)response.response).allHeaderFields[@"PushHeader"], @"PushValue");
 }
 
 - (void)testSYNStreamWithChunkedDataDoesCacheCustomSuggestedResponse
@@ -596,13 +596,13 @@
     _mockExtendedDelegate.testSetsPushResponseCache = URLCache;
 
     [self mockPushResponseWithTwoDataFramesWithId:2];
-    STAssertNotNil(_mockPushResponseDataDelegate.lastWillCacheSuggestedResponse, nil);
-    STAssertEqualObjects(_mockExtendedDelegate.lastPushResponse, _mockPushResponseDataDelegate.lastWillCacheSuggestedResponse.response, nil);
+    XCTAssertNotNil(_mockPushResponseDataDelegate.lastWillCacheSuggestedResponse);
+    XCTAssertEqualObjects(_mockExtendedDelegate.lastPushResponse, _mockPushResponseDataDelegate.lastWillCacheSuggestedResponse.response);
     NSCachedURLResponse *lastCachedResponse = _mockPushResponseDataDelegate.lastWillCacheSuggestedResponse;
 
     NSURLRequest *request = [NSURLRequest requestWithURL:[NSURL URLWithString:@"http://mocked/pushed"]];
     NSCachedURLResponse *response = [_mockExtendedDelegate.testSetsPushResponseCache cachedResponseForRequest:request];
-    STAssertEquals(response.data.length, (NSUInteger)201, nil);
+    XCTAssertEqual(response.data.length, (NSUInteger)201);
 
     NSCachedURLResponse *newCachedResponse = [[NSCachedURLResponse alloc]
             initWithResponse:lastCachedResponse.response
@@ -616,8 +616,8 @@
     [self mockPushResponseWithTwoDataFramesWithId:4];
 
     response = [_mockExtendedDelegate.testSetsPushResponseCache cachedResponseForRequest:request];
-    STAssertEquals(response.data.length, (NSUInteger)1, nil);
-    STAssertEqualObjects(((NSHTTPURLResponse *)response.response).allHeaderFields[@"PushHeader"], @"PushValue", nil);
+    XCTAssertEqual(response.data.length, (NSUInteger)1);
+    XCTAssertEqualObjects(((NSHTTPURLResponse *)response.response).allHeaderFields[@"PushHeader"], @"PushValue");
 }
 
 - (void)testSYNStreamWithChunkedDataDoesNotCache500Response
@@ -628,19 +628,19 @@
     [self mockSynStreamAndReply];
     [self mockServerSynStreamWithId:2 last:NO];
     [self mockServerHeadersFrameWithId:2 headers:headers last:NO];
-    STAssertTrue([self waitForAnyCallbackOrFrame], nil);
+    XCTAssertTrue([self waitForAnyCallbackOrFrame]);
     [self mockServerDataFrameWithId:2 length:1 last:YES];
-    STAssertTrue([self waitForAnyCallbackOrFrame], nil);
+    XCTAssertTrue([self waitForAnyCallbackOrFrame]);
 
-    STAssertNotNil(_mockExtendedDelegate.lastPushResponse, nil);
-    STAssertEquals(_mockExtendedDelegate.lastPushResponse.statusCode, (NSInteger)500, nil);
-    STAssertNil(_mockPushResponseDataDelegate.lastWillCacheSuggestedResponse, nil);
-    STAssertNotNil(_mockPushResponseDataDelegate.lastMetadata, nil);
-    STAssertNil(_mockPushResponseDataDelegate.lastError, nil);
+    XCTAssertNotNil(_mockExtendedDelegate.lastPushResponse);
+    XCTAssertEqual(_mockExtendedDelegate.lastPushResponse.statusCode, (NSInteger)500);
+    XCTAssertNil(_mockPushResponseDataDelegate.lastWillCacheSuggestedResponse);
+    XCTAssertNotNil(_mockPushResponseDataDelegate.lastMetadata);
+    XCTAssertNil(_mockPushResponseDataDelegate.lastError);
 
     NSURLRequest *request = [NSURLRequest requestWithURL:[NSURL URLWithString:@"http://mocked/pushed"]];
     NSCachedURLResponse *response = [_mockExtendedDelegate.testSetsPushResponseCache cachedResponseForRequest:request];
-    STAssertNil(response, nil);
+    XCTAssertNil(response);
 }
 #endif
 

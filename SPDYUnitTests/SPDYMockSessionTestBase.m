@@ -9,7 +9,7 @@
 //  Created by Kevin Goodier.
 //
 
-#import <SenTestingKit/SenTestingKit.h>
+#import <XCTest/XCTest.h>
 #import "SPDYMockFrameEncoderDelegate.h"
 #import "SPDYMockFrameDecoderDelegate.h"
 #import "SPDYMockSessionTestBase.h"
@@ -154,19 +154,19 @@
     SPDYStream *stream = [self createStream];
     [_session openStream:stream];
     if (stream.request.HTTPBody) {
-        STAssertEquals(_mockDecoderDelegate.frameCount, (NSUInteger)2, nil);
-        STAssertTrue([_mockDecoderDelegate.framesReceived[0] isKindOfClass:[SPDYSynStreamFrame class]], nil);
-        STAssertTrue([_mockDecoderDelegate.framesReceived[1] isKindOfClass:[SPDYDataFrame class]], nil);
+        XCTAssertEqual(_mockDecoderDelegate.frameCount, (NSUInteger)2);
+        XCTAssertTrue([_mockDecoderDelegate.framesReceived[0] isKindOfClass:[SPDYSynStreamFrame class]]);
+        XCTAssertTrue([_mockDecoderDelegate.framesReceived[1] isKindOfClass:[SPDYDataFrame class]]);
     } else {
-        STAssertEquals(_mockDecoderDelegate.frameCount, (NSUInteger)1, nil);
-        STAssertTrue([_mockDecoderDelegate.framesReceived[0] isKindOfClass:[SPDYSynStreamFrame class]], nil);
+        XCTAssertEqual(_mockDecoderDelegate.frameCount, (NSUInteger)1);
+        XCTAssertTrue([_mockDecoderDelegate.framesReceived[0] isKindOfClass:[SPDYSynStreamFrame class]]);
     }
     [_mockDecoderDelegate clear];
 
     [self mockServerSynReplyWithId:streamId last:last];
 
     // We should not expect any protocol errors to be issued from the client.
-    STAssertNil(_mockDecoderDelegate.lastFrame, nil);
+    XCTAssertNil(_mockDecoderDelegate.lastFrame);
 
     return stream;
 }
@@ -178,7 +178,7 @@
     synReplyFrame.streamId = streamId;
     synReplyFrame.last = last;
 
-    STAssertTrue([_testEncoder encodeSynReplyFrame:synReplyFrame error:nil] > 0, nil);
+    XCTAssertTrue([_testEncoder encodeSynReplyFrame:synReplyFrame error:nil] > 0);
     [self makeSessionReadData:_testEncoderDelegate.lastEncodedData];
     [_testEncoderDelegate clear];
 }
@@ -189,7 +189,7 @@
     frame.lastGoodStreamId = lastGoodStreamId;
     frame.statusCode = statusCode;
 
-    STAssertTrue([_testEncoder encodeGoAwayFrame:frame] > 0, nil);
+    XCTAssertTrue([_testEncoder encodeGoAwayFrame:frame] > 0);
     [self makeSessionReadData:_testEncoderDelegate.lastEncodedData];
     [_testEncoderDelegate clear];
 }
@@ -201,7 +201,7 @@
     frame.streamId = streamId;
     frame.last = last;
 
-    STAssertTrue([_testEncoder encodeDataFrame:frame] > 0, nil);
+    XCTAssertTrue([_testEncoder encodeDataFrame:frame] > 0);
     [self makeSessionReadData:_testEncoderDelegate.lastEncodedData];
     [_testEncoderDelegate clear];
 }
@@ -223,7 +223,7 @@
     synStreamFrame.headers = headers;
     synStreamFrame.associatedToStreamId = 1;
 
-    STAssertTrue([_testEncoder encodeSynStreamFrame:synStreamFrame error:nil], nil);
+    XCTAssertTrue([_testEncoder encodeSynStreamFrame:synStreamFrame error:nil]);
     [self makeSessionReadData:_testEncoderDelegate.lastEncodedData];
     [_testEncoderDelegate clear];
 }
@@ -242,7 +242,7 @@
     headersFrame.headers = headers;
     headersFrame.last = last;
 
-    STAssertTrue([_testEncoder encodeHeadersFrame:headersFrame error:nil], nil);
+    XCTAssertTrue([_testEncoder encodeHeadersFrame:headersFrame error:nil]);
     [self makeSessionReadData:_testEncoderDelegate.lastEncodedData];
     [_testEncoderDelegate clear];
 }
@@ -255,7 +255,7 @@
     dataFrame.last = last;
     dataFrame.data = [NSMutableData dataWithLength:length];
 
-    STAssertTrue([_testEncoder encodeDataFrame:dataFrame], nil);
+    XCTAssertTrue([_testEncoder encodeDataFrame:dataFrame]);
     [self makeSessionReadData:_testEncoderDelegate.lastEncodedData];
     [_testEncoderDelegate clear];
 }
