@@ -19,6 +19,7 @@
 #import "SPDYCommonLogger.h"
 #import "SPDYOrigin.h"
 #import "SPDYProtocol.h"
+#import "SPDYPushStreamManager.h"
 #import "SPDYSession.h"
 #import "SPDYSessionManager.h"
 #import "SPDYSessionPool.h"
@@ -35,7 +36,7 @@ static void SPDYReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkR
 - (void)session:(SPDYSession *)session capacityIncreased:(NSUInteger)capacity;
 - (void)session:(SPDYSession *)session connectedToNetwork:(bool)cellular;
 - (void)sessionClosed:(SPDYSession *)session error:(NSError *)error;
-- (void)streamCanceled:(SPDYStream *)stream;
+- (void)streamCanceled:(SPDYStream *)stream status:(SPDYStreamStatus)status;
 @end
 
 @implementation SPDYSessionManager
@@ -74,6 +75,7 @@ static void SPDYReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkR
 {
     self = [super init];
     if (self) {
+        _pushStreamManager = [[SPDYPushStreamManager alloc] init];
         _origin = origin;
         _pendingStreams = [[SPDYStreamManager alloc] init];
         _basePool = [[SPDYSessionPool alloc] init];
@@ -155,7 +157,7 @@ static void SPDYReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkR
 
 #pragma mark SPDYStreamDelegate
 
-- (void)streamCanceled:(SPDYStream *)stream
+- (void)streamCanceled:(SPDYStream *)stream status:(SPDYStreamStatus)status
 {
     NSAssert(_pendingStreams[stream.protocol], @"stream delegate must be managing stream");
 

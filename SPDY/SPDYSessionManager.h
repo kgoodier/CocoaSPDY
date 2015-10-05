@@ -11,9 +11,11 @@
 
 #import <Foundation/Foundation.h>
 
-@protocol SPDYSessionDelegate;
+@class SPDYPushStreamManager;
 
 @interface SPDYSessionManager : NSObject
+
+@property (nonatomic, readonly) SPDYPushStreamManager *pushStreamManager;
 
 + (SPDYSessionManager *)localManagerForOrigin:(SPDYOrigin *)origin;
 - (void)queueStream:(SPDYStream *)stream;
